@@ -32,6 +32,12 @@ const GameScreen = () => {
 
   const usedLetters = useSharedValue<string>('');
   const shouldCheck = useSharedValue(false);
+
+  const isReadyToCheck =
+    wordRows[activeRow.current].length === 5 && WORDS.includes(wordRows[activeRow.current]);
+
+  const isGameEnded = activeRow.current === 5 || wordRows[activeRow.current] === target;
+
   useEffect(() => {
     InteractionManager.runAfterInteractions(() => {
       setIsLoading(false);
@@ -69,8 +75,8 @@ const GameScreen = () => {
     router.replace({ pathname: '/result', params: { target } });
   };
 
-  if (wordRows[activeRow.current].length === 5 && WORDS.includes(wordRows[activeRow.current])) {
-    if (activeRow.current === 5 || wordRows[activeRow.current] === target) {
+  if (isReadyToCheck) {
+    if (isGameEnded) {
       setTimeout(() => handleGameEnd(), ANIMATION_DURATION * ROW_LENGTH);
     } else {
       activeRow.current++;
