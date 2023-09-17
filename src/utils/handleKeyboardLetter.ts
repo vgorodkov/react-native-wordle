@@ -1,3 +1,4 @@
+import { Theme } from 'assets/theme';
 import { SharedValue } from 'react-native-reanimated';
 
 //expected 2d array of colors. colors[rowIndex][letterIndexInRow]
@@ -12,13 +13,13 @@ export const handleKeyboardLetterAnimation = (
   let color = '';
   switch (variant) {
     case 'correct':
-      color = '#05B2DC';
+      color = Theme.colors.correctLetter;
       break;
     case 'inWord':
-      color = '#B58DB6';
+      color = Theme.colors.inWordLetter;
       break;
     case 'notInWord':
-      color = 'black';
+      color = Theme.colors.notInWordLetter;
       break;
     default:
       break;
