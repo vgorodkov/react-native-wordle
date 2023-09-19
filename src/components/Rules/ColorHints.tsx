@@ -15,6 +15,7 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderWidth: 1,
+    borderColor: 'white',
   },
   colorHint: {
     flexDirection: 'row',

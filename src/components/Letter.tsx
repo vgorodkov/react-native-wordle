@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
   wordBox: {
     width: Layout.wordBox,
     height: Layout.wordBox,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
