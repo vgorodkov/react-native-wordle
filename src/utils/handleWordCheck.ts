@@ -21,12 +21,11 @@ export const handleWordCheck = (word: string, target: string) => {
       continue;
     } else if (
       loweredTarget.includes(loweredWord[i]) &&
-      loweredWord[i - 1] !== loweredWord[i] &&
-      !loweredWord.slice(0, i).includes(loweredWord[i])
+      !letters.correct.includes(loweredWord[i])
     ) {
       letters.inWord.push(word[i]);
       continue;
-    } else {
+    } else if (!letters.correct.includes(loweredWord[i])) {
       letters.notInWord.push(word[i]);
       continue;
     }

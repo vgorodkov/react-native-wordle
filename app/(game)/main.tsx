@@ -3,30 +3,33 @@ import {
   View,
   ImageBackground,
   InteractionManager,
-  Text,
   ActivityIndicator,
 } from 'react-native';
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-
 import { useSharedValue } from 'react-native-reanimated';
-
 import { router } from 'expo-router';
 import { WordRow } from 'components/WordRow';
 import { getRandomWord } from 'utils/getRandomWord';
-
 import { StatusBar } from 'expo-status-bar';
 import CustomKeyboard from 'components/Keyboard';
 import { verticalScale } from 'utils/metrics';
+import { Loading } from 'components/Loading';
 
+const WORDS = require('../../src/data/be-5.json');
 const NUM_ROWS = 6;
 const ROW_LENGTH = 5;
 const ANIMATION_DURATION = 300;
 
 const GameScreen = () => {
-  const WORDS = require('../../src/data/be-5.json');
   const [isLoading, setIsLoading] = useState(true);
   const [target, setTarget] = useState(getRandomWord(WORDS));
   const [wordRows, setWordRows] = useState(['', '', '', '', '', '']);
+
+  useEffect(() => {
+    InteractionManager.runAfterInteractions(() => {
+      setIsLoading(false);
+    });
+  }, []);
 
   const activeRow = useRef(0);
 
@@ -35,14 +38,8 @@ const GameScreen = () => {
 
   const isReadyToCheck =
     wordRows[activeRow.current].length === 5 && WORDS.includes(wordRows[activeRow.current]);
-
   const isGameEnded = activeRow.current === 5 || wordRows[activeRow.current] === target;
 
-  useEffect(() => {
-    InteractionManager.runAfterInteractions(() => {
-      setIsLoading(false);
-    });
-  }, []);
   if (wordRows[activeRow.current].length > 4) {
     usedLetters.value = wordRows[activeRow.current];
   }
@@ -85,15 +82,7 @@ const GameScreen = () => {
   }
 
   if (isLoading) {
-    return (
-      <ImageBackground
-        imageStyle={{ flex: 1 }}
-        source={require('assets/first_theme.png')}
-        style={styles.loadingContainer}
-      >
-        <ActivityIndicator color={'white'} size={'large'} />
-      </ImageBackground>
-    );
+    return <Loading />;
   }
 
   return (
@@ -132,15 +121,8 @@ export default GameScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
     paddingVertical: verticalScale(64),
     backgroundColor: 'white',
     alignItems: 'center',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'black',
   },
 });

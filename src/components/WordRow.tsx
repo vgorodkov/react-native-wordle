@@ -8,7 +8,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Letter } from './Letter';
-import { handleWordAnimation } from 'utils/handleWordAnimation';
+import { handleWord, handleWordAnimation } from 'utils/handleWordAnimation';
 import { moderateScale, scale } from 'utils/metrics';
 import { Layout } from 'constants/layout';
 
@@ -30,7 +30,8 @@ export const WordRow = memo(
 
     const handleColorAnimation = () => {
       if (row.length === 5 && WORDS.includes(row)) {
-        handleWordAnimation(row, target, colors);
+        /*   handleWordAnimation(row, target, colors); */
+        handleWord(row, target, colors);
       } else if (row.length === 5) {
         for (let i = 0; i < row.length; i++) {
           colors[i].value = withSequence(
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
   wordBox: {
     width: Layout.wordBox,
     height: Layout.wordBox,
-    borderWidth: 1,
+    borderWidth: 2,
     borderColor: 'white',
     justifyContent: 'center',
   },
