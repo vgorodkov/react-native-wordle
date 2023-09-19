@@ -1,6 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import { LinearGradient } from 'expo-linear-gradient';
 import { Example } from 'components/Rules/Example';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { StatusBar } from 'expo-status-bar';
@@ -16,7 +15,7 @@ const RULES = [
 
 const Rules = () => {
   return (
-    <LinearGradient colors={['#26232A', '#372D35', '#554958']} style={styles.container}>
+    <View style={styles.container}>
       <StatusBar translucent style="light" />
       <Link asChild href={'/'}>
         <Ionicons style={styles.backBtn} size={32} color={'white'} name="exit-outline" />
@@ -32,7 +31,7 @@ const Rules = () => {
           ),
         )}
       </View>
-    </LinearGradient>
+    </View>
   );
 };
 
@@ -41,7 +40,7 @@ export default Rules;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-
+    backgroundColor: 'black',
     alignItems: 'center',
     padding: 16,
   },

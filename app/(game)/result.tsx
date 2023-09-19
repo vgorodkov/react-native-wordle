@@ -1,13 +1,16 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 
 import { router, useLocalSearchParams } from 'expo-router';
-import { LinearGradient } from 'expo-linear-gradient';
 
 const Result = () => {
   const { target } = useLocalSearchParams();
   return (
-    <LinearGradient colors={['#26232A', '#372D35', '#554958']} style={styles.container}>
+    <ImageBackground
+      style={styles.container}
+      imageStyle={{ flex: 1 }}
+      source={require('assets/first_theme.png')}
+    >
       <Text style={styles.txt}>Правільнае слова:</Text>
       <Text style={[styles.targetWord, styles.txt]}>{target}</Text>
       <View style={styles.btnContainer}>
@@ -18,7 +21,7 @@ const Result = () => {
           <Text style={styles.txt}>Далей</Text>
         </Pressable>
       </View>
-    </LinearGradient>
+    </ImageBackground>
   );
 };
 
