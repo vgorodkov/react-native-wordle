@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TouchableOpacity, ImageBackground } from 'react-native';
+import { StyleSheet, View, ImageBackground, Image } from 'react-native';
 import React, { useCallback } from 'react';
 import { Link } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -20,7 +20,13 @@ const Start = () => {
   }, [fontsLoaded, fontError]);
 
   if (!fontsLoaded && !fontError) {
-    return null;
+    return (
+      <ImageBackground
+        resizeMode="cover"
+        style={styles.bgImg}
+        source={require('../src/assets/first_theme.png')}
+      />
+    );
   }
 
   return (
