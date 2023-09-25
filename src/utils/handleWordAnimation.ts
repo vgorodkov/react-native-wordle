@@ -22,11 +22,11 @@ export const handleCorrectWord = (word: string, target: string, colors: SharedVa
     if (!correctIndicies.includes(i)) {
       if (newTarget.includes(word[i])) {
         colors[i].value = withTiming(Theme.colors.inWordLetter, {
-          duration: ANIMATION_DURATION * i,
+          duration: ANIMATION_DURATION * (i + 1),
         });
       } else if (!correctIndicies.includes(i)) {
         colors[i].value = withTiming(Theme.colors.notInWordLetter, {
-          duration: ANIMATION_DURATION * i,
+          duration: ANIMATION_DURATION * (i + 1),
         });
       }
     }
@@ -36,8 +36,8 @@ export const handleCorrectWord = (word: string, target: string, colors: SharedVa
 export const handleIncorrectWord = (colors: SharedValue<string>[], row: string) => {
   for (let i = 0; i < row.length; i++) {
     colors[i].value = withSequence(
-      withTiming('#EF271B', { duration: ANIMATION_DURATION * 2 }),
-      withTiming('transparent'),
+      withTiming('#EF271B', { duration: ANIMATION_DURATION * (i + 1) }),
+      withTiming('transparent', { duration: ANIMATION_DURATION * (i + 1) }),
     );
   }
 };
