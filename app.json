@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "wordle",
-    "slug": "wordle",
+    "name": "beWordle",
+    "slug": "beWordle",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -28,7 +28,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/foreground-image.png",
+        "backgroundImage": "./assets/background-image.png",
         "backgroundColor": "#000000"
       },
       "package": "com.tragediabelok.wordle"
