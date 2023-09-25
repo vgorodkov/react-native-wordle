@@ -27,9 +27,9 @@ const handleUniqueLetters = (
         value.forEach((letter) => {
           if (!uniqueLetters.current.correct.includes(letter)) {
             uniqueLetters.current.correct.push(letter);
-            if (uniqueLetters.current.inWord.includes(letter)) {
+            /*  if (uniqueLetters.current.inWord.includes(letter)) {
               uniqueLetters.current.inWord.splice(0, 1);
-            }
+            } */
           }
         });
         break;
@@ -87,7 +87,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = memo(
           const letters = handleWordCheck(usedLetters.value, target);
 
           handleUniqueLetters(unique, letters);
-          console.log(unique.current);
+
           for (const [key, value] of Object.entries(unique.current)) {
             handleKeyboardLetterAnimation(value, rows, colors, key);
           }
