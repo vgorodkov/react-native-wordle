@@ -1,6 +1,12 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { MutableRefObject, memo, useState } from 'react';
-import { useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import {
+  SharedValue,
+  useAnimatedReaction,
+  useSharedValue,
+  withSequence,
+  withTiming,
+} from 'react-native-reanimated';
 import { Letter } from './Letter';
 import { handleCorrectWord, handleIncorrectWord } from 'utils/handleWordAnimation';
 import { moderateScale } from 'utils/metrics';
@@ -19,6 +25,13 @@ interface WordRowProps {
   correctLetters: MutableRefObject<string[]>;
   isActive: boolean;
 }
+
+const returnDefaultColor = (colors: SharedValue<string>[], row: string) => {
+  'worklet';
+  for (let i = 0; i < row.length; i++) {
+    colors[i].value = 'transparent';
+  }
+};
 
 export const WordRow = memo(
   ({

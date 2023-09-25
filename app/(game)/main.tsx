@@ -1,10 +1,4 @@
-import {
-  StyleSheet,
-  View,
-  ImageBackground,
-  InteractionManager,
-  ActivityIndicator,
-} from 'react-native';
+import { StyleSheet, View, ImageBackground, InteractionManager, Text } from 'react-native';
 import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import { router } from 'expo-router';
@@ -110,6 +104,7 @@ const GameScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <StatusBar translucent={true} style="light" />
+
       <ImageBackground
         imageStyle={{ flex: 1 }}
         source={require('assets/first_theme.png')}
