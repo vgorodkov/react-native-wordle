@@ -14,7 +14,7 @@ import React, { useEffect, useRef } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Difficulties, useDifficulty } from 'components/DifficultyProvider';
 import { Theme } from 'assets/theme';
-import { removeValue } from 'utils/removeValue';
+import { removeValue } from 'utils/asyncStorage';
 
 const DIFFICULTIES = [
   {
