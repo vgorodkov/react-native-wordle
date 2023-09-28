@@ -1,5 +1,6 @@
 import { StyleSheet, View, ImageBackground, InteractionManager, Text } from 'react-native';
 import React, { MutableRefObject, useCallback, useEffect, useRef, useState } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSharedValue } from 'react-native-reanimated';
 import { router } from 'expo-router';
 import { WordRow } from 'components/WordRow';
@@ -8,8 +9,8 @@ import { StatusBar } from 'expo-status-bar';
 import CustomKeyboard from 'components/Keyboard';
 import { verticalScale } from 'utils/metrics';
 import { Loading } from 'components/Loading';
-
-const WORDS = require('../../src/data/be-5.json');
+import { useDifficulty } from 'components/DifficultyProvider';
+import * as Haptics from 'expo-haptics';
 const NUM_ROWS = 6;
 const ROW_LENGTH = 5;
 const ANIMATION_DURATION = 300;
@@ -27,15 +28,76 @@ const setCorrectLetters = (
   }
 };
 
+const storeWordRows = async (wordRows: string[], key: string) => {
+  try {
+    const jsonValue = JSON.stringify(wordRows);
+    await AsyncStorage.setItem(key, jsonValue);
+  } catch (e) {}
+};
+
+const storeTarget = async (target: string, key: string) => {
+  try {
+    await AsyncStorage.setItem(key, target);
+  } catch (e) {}
+};
+
+const getStoredValue = async (key: string) => {
+  try {
+    const jsonValue = await AsyncStorage.getItem(key);
+
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (e) {}
+};
+
+const getStoredTarget = async (key: string) => {
+  try {
+    return await AsyncStorage.getItem(key);
+  } catch (e) {
+    // read error
+  }
+};
+
+const removeValue = async (key: string) => {
+  try {
+    await AsyncStorage.removeItem(key);
+  } catch (e) {}
+};
+
 const GameScreen = () => {
+  const { difficulty, canBeUsedWords, allWords } = useDifficulty();
+
   const [isLoading, setIsLoading] = useState(true);
-  const [target, setTarget] = useState(getRandomWord(WORDS));
+  const [target, setTarget] = useState('');
   const [wordRows, setWordRows] = useState(['', '', '', '', '', '']);
 
   useEffect(() => {
-    InteractionManager.runAfterInteractions(() => {
-      setIsLoading(false);
-    });
+    setIsLoading(true);
+
+    getStoredValue('word-rows')
+      .then((data) => {
+        if (data) {
+          setWordRows(data);
+          let active = 0;
+          for (let i = 0; i < data.length; i++) {
+            if (data[i].length === 5) {
+              active++;
+            }
+          }
+          activeRow.current = active;
+        } else {
+          setWordRows(['', '', '', '', '', '']);
+        }
+      })
+      .catch((e) => {});
+    getStoredTarget('target')
+      .then((data) => {
+        if (data) {
+          setTarget(data);
+        } else {
+          setTarget(getRandomWord(canBeUsedWords));
+        }
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
   const activeRow = useRef(0);
@@ -48,9 +110,10 @@ const GameScreen = () => {
   const shouldCheck = useSharedValue(false);
 
   const isGameEnded = activeRow.current === 5 || wordRows[activeRow.current] === target;
-  const isLongEnough = wordRows[activeRow.current].trim().length === ROW_LENGTH;
-  const isExistingWord = WORDS.includes(wordRows[activeRow.current]);
+  const isLongEnough = wordRows[activeRow.current].length === ROW_LENGTH;
+  const isExistingWord = allWords.includes(wordRows[activeRow.current]);
   const isReadyToCheck = isLongEnough && isExistingWord;
+  const hasGameStarted = wordRows[0].length === 5;
 
   if (isLongEnough) {
     usedLetters.value = wordRows[activeRow.current];
@@ -87,13 +150,23 @@ const GameScreen = () => {
     router.replace({ pathname: '/result', params: { target } });
   };
 
+  if (hasGameStarted) {
+    storeTarget(target, 'target');
+  }
+
   if (isReadyToCheck) {
     if (isGameEnded) {
       //wait for animation end and end game
+
+      removeValue('word-rows');
+      removeValue('target');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       setTimeout(() => handleGameEnd(), ANIMATION_DURATION * ROW_LENGTH);
     } else {
       activeRow.current++;
       shouldCheck.value = true;
+      storeWordRows(wordRows, 'word-rows');
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     }
   }
 
@@ -104,10 +177,9 @@ const GameScreen = () => {
   return (
     <View style={{ flex: 1 }}>
       <StatusBar translucent={true} style="light" />
-
       <ImageBackground
         imageStyle={{ flex: 1 }}
-        source={require('assets/first_theme.png')}
+        source={require('assets/background-stars.png')}
         style={styles.container}
       >
         <View>
