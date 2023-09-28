@@ -28,9 +28,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/foreground-image.png",
-        "backgroundImage": "./assets/background-image.png",
-        "backgroundColor": "#000000"
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1A1A1A"
       },
       "package": "com.tragediabelok.wordle"
     },
