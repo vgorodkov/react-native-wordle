@@ -1,7 +1,7 @@
 export const Theme = {
   colors: {
-    correctLetter: '#05B2DC',
-    inWordLetter: '#37515F',
-    notInWordLetter: 'black',
+    correctLetter: '#5B9279',
+    inWordLetter: '#FC7A1E',
+    notInWordLetter: '#403737',
   },
 };

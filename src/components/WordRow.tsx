@@ -13,8 +13,7 @@ import { moderateScale } from 'utils/metrics';
 import { Layout } from 'constants/layout';
 import { Theme } from 'assets/theme';
 import * as Haptics from 'expo-haptics';
-
-const WORDS = require('../../src/data/be-5.json');
+import { useDifficulty } from './DifficultyProvider';
 
 interface WordRowProps {
   row: string;
@@ -25,13 +24,6 @@ interface WordRowProps {
   correctLetters: MutableRefObject<string[]>;
   isActive: boolean;
 }
-
-const returnDefaultColor = (colors: SharedValue<string>[], row: string) => {
-  'worklet';
-  for (let i = 0; i < row.length; i++) {
-    colors[i].value = 'transparent';
-  }
-};
 
 export const WordRow = memo(
   ({
@@ -45,14 +37,16 @@ export const WordRow = memo(
   }: WordRowProps) => {
     const letters = row.split('');
     const colors = [...Array(5)].map(() => useSharedValue('rgba(0,0,0,0.2)'));
+    const { allWords } = useDifficulty();
 
     const handleColor = () => {
-      if (row.trim().length === 5 && WORDS.includes(row)) {
+      if (row.length === 5 && allWords.includes(row)) {
         handleCorrectWord(row, target, colors);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else if (row.trim().length === 5) {
         handleIncorrectWord(colors, row);
-        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        {
+          isActive && Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+        }
       }
     };
 
