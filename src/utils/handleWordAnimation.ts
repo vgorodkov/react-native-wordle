@@ -36,8 +36,8 @@ export const handleCorrectWord = (word: string, target: string, colors: SharedVa
 export const handleIncorrectWord = (colors: SharedValue<string>[], row: string) => {
   for (let i = 0; i < row.length; i++) {
     colors[i].value = withSequence(
-      withTiming('#EF271B', { duration: ANIMATION_DURATION * (i + 1) }),
-      withTiming('transparent', { duration: ANIMATION_DURATION * (i + 1) }),
+      withTiming('#FE5F55', { duration: (ANIMATION_DURATION / 2) * (i + 1) }),
+      withTiming('transparent', { duration: (ANIMATION_DURATION / 2) * (i + 1) }),
     );
   }
 };
