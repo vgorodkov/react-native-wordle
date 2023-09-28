@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { Example } from 'components/Rules/Example';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -15,7 +15,7 @@ const RULES = [
 
 const Rules = () => {
   return (
-    <View style={styles.container}>
+    <ImageBackground source={require('assets/background-stars.png')} style={styles.container}>
       <StatusBar translucent style="light" />
       <Link asChild href={'/'}>
         <Ionicons style={styles.backBtn} size={32} color={'white'} name="exit-outline" />
@@ -31,7 +31,7 @@ const Rules = () => {
           ),
         )}
       </View>
-    </View>
+    </ImageBackground>
   );
 };
 

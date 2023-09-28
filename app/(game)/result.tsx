@@ -9,7 +9,7 @@ const Result = () => {
     <ImageBackground
       style={styles.container}
       imageStyle={{ flex: 1 }}
-      source={require('assets/first_theme.png')}
+      source={require('assets/background-stars.png')}
     >
       <Text style={styles.txt}>Правільнае слова:</Text>
       <Text style={[styles.targetWord, styles.txt]}>{target}</Text>
@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
   btn: {
     borderWidth: 1,
     padding: 12,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+
     borderColor: 'white',
 
     borderRadius: 4,

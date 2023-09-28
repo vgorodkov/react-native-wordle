@@ -5,10 +5,10 @@ export const Loading = () => {
   return (
     <ImageBackground
       imageStyle={{ flex: 1 }}
-      source={require('assets/first_theme.png')}
+      source={require('assets/background-stars.png')}
       style={styles.loadingContainer}
     >
-      <ActivityIndicator color={'white'} size={'large'} />
+      <ActivityIndicator color={'#F6E7BE'} size={'large'} />
     </ImageBackground>
   );
 };
