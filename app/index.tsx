@@ -1,6 +1,6 @@
-import { StyleSheet, View, ImageBackground, Image } from 'react-native';
+import { StyleSheet, View, ImageBackground, Image, useWindowDimensions } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
-import { Link } from 'expo-router';
+import { Link, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
@@ -13,16 +13,22 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import { getStoredStr } from 'utils/asyncStorage';
 
 SplashScreen.preventAutoHideAsync();
+
+const ANIMATION_DURATION = 40000;
 
 const Start = () => {
   const [fontsLoaded, fontError] = useFonts({
     'JetBrainsMono-Regular': require('assets/fonts/JetBrainsMono-Regular.ttf'),
     'JetBrainsMono-Bold': require('assets/fonts/JetBrainsMono-Bold.ttf'),
+    'JetBrainsMono-Medium': require('assets/fonts/JetBrainsMono-Medium.ttf'),
   });
 
   const { difficulty } = useDifficulty();
+
+  const { width } = useWindowDimensions();
 
   const translateY = useSharedValue(0);
   const translateX = useSharedValue(0);
@@ -34,21 +40,30 @@ const Start = () => {
   });
 
   useEffect(() => {
-    if (!fontsLoaded && !fontError) {
+    if (fontsLoaded && !fontError) {
       translateX.value = withRepeat(
-        withSequence(withTiming(100, { duration: 10000 }), withTiming(0, { duration: 10000 })),
+        withSequence(
+          withTiming(width - 100, { duration: ANIMATION_DURATION }),
+          withTiming(0, { duration: ANIMATION_DURATION }),
+        ),
         -1,
       );
       translateY.value = withRepeat(
         withSequence(
-          withTiming(-25, { duration: 10000 }),
-          withTiming(0, { duration: 10000 }),
-          withTiming(25, { duration: 10000 }),
+          withTiming(-80, { duration: ANIMATION_DURATION }),
+          withTiming(20, { duration: ANIMATION_DURATION }),
+          withTiming(0, { duration: ANIMATION_DURATION }),
         ),
         -1,
       );
     }
-  }, []);
+
+    getStoredStr('rules-opened').then((data) => {
+      if (!data && fontsLoaded && !fontError) {
+        router.push('rules');
+      }
+    });
+  }, [fontsLoaded, fontError]);
 
   const getDifficultyImg = (difficulty: number) => {
     switch (difficulty) {
@@ -94,7 +109,7 @@ const Start = () => {
           style={[styles.difficultyImg, animatedImage]}
           source={getDifficultyImg(difficulty)}
         />
-        <Link style={styles.playBtn} href={'/main'}>
+        <Link style={styles.playBtn} href={'/game'}>
           Гуляць
         </Link>
         <Link style={styles.txt} href={'/difficulty'}>
