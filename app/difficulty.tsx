@@ -14,7 +14,9 @@ import React, { useEffect, useRef } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Difficulties, useDifficulty } from 'components/DifficultyProvider';
 import { Theme } from 'assets/theme';
-import { removeValue } from 'utils/asyncStorage';
+import { getStoredStr, removeValue } from 'utils/asyncStorage';
+import { Progressbar } from 'components/Progressbar';
+import { useSharedValue, withTiming } from 'react-native-reanimated';
 
 const DIFFICULTIES = [
   {
@@ -60,6 +62,12 @@ const DifficultyItem = ({
   name,
 }: DifficultyItemProps) => {
   const isActive = activeDifficulty === difficultyIndex;
+  const { progress, canBeUsedWords } = useDifficulty();
+  const progressBar = useSharedValue(0);
+
+  useEffect(() => {
+    progressBar.value = withTiming((progress * 100) / canBeUsedWords.length, { duration: 300 });
+  }, [progress, canBeUsedWords]);
 
   return (
     <View style={styles.difficultyItemContainer}>
@@ -68,9 +76,20 @@ const DifficultyItem = ({
         <Image style={styles.img} source={img} />
         <Text style={[styles.txt, styles.body, isActive && styles.activeTxt]}>{description}</Text>
       </View>
+      {isActive && (
+        <View>
+          <Text style={styles.txt}>Пройдено:</Text>
+          <Text style={styles.txt}>
+            {progress}/{canBeUsedWords.length}
+          </Text>
+          <Progressbar progress={progressBar} color="#F6E7BE" />
+        </View>
+      )}
       <>
-        {isActive && (
+        {isActive ? (
           <Text style={[styles.txt, styles.label, styles.activeTxt]}>Абраная зараз</Text>
+        ) : (
+          <View></View>
         )}
       </>
     </View>
@@ -123,7 +142,7 @@ const Difficulty = () => {
         pagingEnabled
         ref={listRef}
         initialScrollIndex={difficulty}
-        getItemLayout={(data, index) => ({ length: height, offset: width * index, index })}
+        getItemLayout={(_, index) => ({ length: height, offset: width * index, index })}
         onMomentumScrollEnd={({ nativeEvent }) => {
           listPosition.current = Math.round(nativeEvent.contentOffset.x / width);
         }}
@@ -187,7 +206,7 @@ const styles = StyleSheet.create({
   },
   difficultyItemContainer: {
     flex: 1,
-    alignItems: 'center',
+
     alignSelf: 'center',
     paddingHorizontal: 32,
     justifyContent: 'space-between',

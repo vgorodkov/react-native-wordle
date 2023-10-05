@@ -43,9 +43,8 @@ const styles = StyleSheet.create({
   letterButton: {
     width: width / 14,
     paddingVertical: Layout.extraSmallPadding,
-    borderColor: 'white',
-    borderWidth: 1,
-    margin: scale(2),
+
+    margin: 2,
     alignItems: 'center',
     borderRadius: 4,
   },

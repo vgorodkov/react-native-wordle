@@ -1,33 +1,32 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import React, { memo } from 'react';
-import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import { Layout } from 'constants/layout';
 import { moderateScale } from 'utils/metrics';
+import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 
 interface LetterProps {
-  color: SharedValue<string>;
   letter: string;
+  color: SharedValue<string>;
+  onWordLetter: (letterIndex: number) => void;
   letterIndex: number;
-  handleLetterDelete: (letterIndex: number, rowIndex: number) => void;
-  rowIndex: number;
+  activeCol: number;
 }
 
 export const Letter = memo(
-  ({ letter, letterIndex, rowIndex, handleLetterDelete, color }: LetterProps) => {
-    const letterStyle = useAnimatedStyle(() => {
+  ({ letter, color, letterIndex, onWordLetter, activeCol }: LetterProps) => {
+    const isActive = activeCol === letterIndex;
+
+    const aStyle = useAnimatedStyle(() => {
       return {
         backgroundColor: color.value,
       };
     });
-
-    const onLetter = () => {
-      handleLetterDelete(letterIndex, rowIndex);
-    };
-
     return (
-      <Pressable onPress={onLetter}>
-        <Animated.View style={[styles.wordBox, letterStyle]}>
-          <Text style={styles.wordLetter}>{letter.toUpperCase()}</Text>
+      <Pressable onPress={() => onWordLetter(letterIndex)}>
+        <Animated.View
+          style={[styles.wordBox, aStyle, isActive && { borderWidth: 3, borderColor: '#F6E7BE' }]}
+        >
+          <Text style={styles.letter}>{letter.toUpperCase()}</Text>
         </Animated.View>
       </Pressable>
     );
@@ -38,12 +37,13 @@ const styles = StyleSheet.create({
   wordBox: {
     width: Layout.wordBox,
     height: Layout.wordBox,
-    borderWidth: 2,
+    borderWidth: 1,
     borderColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: 0,
   },
-  wordLetter: {
+  letter: {
     fontSize: moderateScale(20, 2),
     color: 'white',
     fontWeight: '600',

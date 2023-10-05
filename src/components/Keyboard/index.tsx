@@ -1,5 +1,5 @@
-import React, { MutableRefObject, memo, useRef } from 'react';
-import { View, StyleSheet, Dimensions } from 'react-native';
+import React, { MutableRefObject, memo, useCallback, useRef } from 'react';
+import { View, StyleSheet, Dimensions, Text, Pressable } from 'react-native';
 import { SharedValue, useAnimatedReaction, useSharedValue } from 'react-native-reanimated';
 import { handleKeyboardLetterAnimation } from 'utils/handleKeyboardLetter';
 import { handleWordCheck } from 'utils/handleWordCheck';
@@ -12,6 +12,8 @@ interface CustomKeyboardProps {
   usedLetters: SharedValue<string>;
   shouldCheck: SharedValue<boolean>;
   target: string;
+  handleLetterDelete: () => void;
+  handleLongLetterDelete: () => void;
 }
 
 const { width } = Dimensions.get('window');
@@ -27,9 +29,9 @@ const handleUniqueLetters = (
         value.forEach((letter) => {
           if (!uniqueLetters.current.correct.includes(letter)) {
             uniqueLetters.current.correct.push(letter);
-            /*  if (uniqueLetters.current.inWord.includes(letter)) {
+            if (uniqueLetters.current.inWord.includes(letter)) {
               uniqueLetters.current.inWord.splice(0, 1);
-            } */
+            }
           }
         });
         break;
@@ -61,9 +63,16 @@ const handleUniqueLetters = (
 };
 
 const CustomKeyboard: React.FC<CustomKeyboardProps> = memo(
-  ({ onLetterPress, usedLetters, shouldCheck, target }) => {
+  ({
+    onLetterPress,
+    usedLetters,
+    shouldCheck,
+    target,
+    handleLetterDelete,
+    handleLongLetterDelete,
+  }) => {
     const rows = ["йцукенгшўзх'", 'фывапролджэ', 'ячсмітьбю'];
-    const colors = rows.map((item) => item.split('').map(() => useSharedValue('transparent')));
+    const colors = rows.map((item) => item.split('').map(() => useSharedValue('#363229')));
     const unique = useRef<{
       correct: string[];
       inWord: string[];
@@ -97,7 +106,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = memo(
       },
     );
 
-    const renderLetterButtons = () => {
+    const renderLetterButtons = useCallback(() => {
       return rows.map((row, rowIndex) => (
         <View key={rowIndex} style={styles.row}>
           {row.split('').map((item, index) => (
@@ -111,23 +120,53 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = memo(
           ))}
         </View>
       ));
-    };
+    }, []);
 
-    return <View style={styles.container}>{renderLetterButtons()}</View>;
+    return (
+      <View style={styles.container}>
+        {renderLetterButtons()}
+        <Pressable
+          onPress={handleLetterDelete}
+          onLongPress={handleLongLetterDelete}
+          style={({ pressed }) =>
+            pressed ? [styles.deleteBtn, styles.deleteBtnPressed] : styles.deleteBtn
+          }
+        >
+          <Text style={styles.deleteBtnTxt}>Выдаліць</Text>
+        </Pressable>
+      </View>
+    );
   },
 );
 
 const styles = StyleSheet.create({
   container: {
-    position: 'absolute',
-    bottom: 0,
     width: width,
-    paddingVertical: Layout.smallPadding,
-    backgroundColor: 'rgba(0,0,0,0.2)',
+    paddingBottom: 16,
+    paddingVertical: 8,
   },
   row: {
     flexDirection: 'row',
     justifyContent: 'center',
+  },
+  deleteBtn: {
+    backgroundColor: '#363229',
+    alignItems: 'center',
+    justifyContent: 'center',
+
+    paddingVertical: 8,
+    marginTop: 4,
+    marginHorizontal: 32,
+    borderRadius: 4,
+  },
+  deleteBtnPressed: {
+    opacity: 0.5,
+  },
+  deleteBtnTxt: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'JetBrainsMono-Bold',
   },
 });
 

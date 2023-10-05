@@ -17,10 +17,12 @@ const COLORS_HINTS = [
   { color: Theme.colors.notInWordLetter, hintText: '- літары ў слове няма.' },
 ];
 
-export const Example = ({ rule }: { rule: string }) => {
+export const Example = ({ rule, index }: { rule: string; index: number }) => {
   return (
     <View style={styles.rulesContent}>
-      <Text style={styles.ruleTxt}>{rule}</Text>
+      <Text style={styles.ruleTxt}>
+        {index + 1}. {rule}
+      </Text>
       <View style={styles.exampleContainer}>
         {EXAMPLE.map((item, index) => (
           <ExampleLetter key={index} letter={item.letter} bgColor={item.bgColor} />

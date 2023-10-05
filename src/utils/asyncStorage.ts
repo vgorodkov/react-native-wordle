@@ -6,16 +6,16 @@ export const removeValue = async (key: string) => {
   } catch (e) {}
 };
 
-export const storeObj = async (wordRows: string[], key: string) => {
+export const storeObj = async (obj: string[] | string[][], key: string) => {
   try {
-    const jsonValue = JSON.stringify(wordRows);
+    const jsonValue = JSON.stringify(obj);
     await AsyncStorage.setItem(key, jsonValue);
   } catch (e) {}
 };
 
-export const storeStr = async (target: string, key: string) => {
+export const storeStr = async (str: string, key: string) => {
   try {
-    await AsyncStorage.setItem(key, target);
+    await AsyncStorage.setItem(key, str);
   } catch (e) {}
 };
 

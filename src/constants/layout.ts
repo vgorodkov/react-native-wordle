@@ -5,5 +5,5 @@ export const Layout = {
   mediumPadding: scale(24),
   smallPadding: scale(16),
   extraSmallPadding: scale(8),
-  wordBox: scale(48),
+  wordBox: verticalScale(58),
 };
