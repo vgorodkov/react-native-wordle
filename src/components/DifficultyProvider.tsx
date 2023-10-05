@@ -1,4 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { ReactNode, useEffect } from 'react';
+import { getStoredStr } from 'utils/asyncStorage';
 
 export enum Difficulties {
   Easy,
@@ -12,6 +14,8 @@ interface DifficultyContextValue {
   difficulty: Difficulties;
   canBeUsedWords: string[];
   allWords: string[];
+  progress: number;
+  setProgress: (progress: number) => void;
 }
 
 const DifficultyContext = React.createContext<DifficultyContextValue | null>(null);
@@ -28,22 +32,40 @@ interface DifficultyProviderProps {
   children: ReactNode;
 }
 
-const ALL_WORDS = require('data/be-5.json');
-const EASY_WORDS = require('data/be-5-easy.json');
+export const ALL_WORDS = require('data/be-5.json');
+const EASY_WORDS = require('data/shuffled-easy.json');
+export const EASY_NOUNS = require('data/be-5-easy-nouns.json');
 
 export function DifficultyProvider({ children }: DifficultyProviderProps) {
   const [difficulty, setDifficulty] = React.useState(Difficulties.Easy);
   const [words, setWords] = React.useState(ALL_WORDS);
+  const [progress, setProgress] = React.useState(0);
+
   useEffect(() => {
     switch (difficulty) {
       case Difficulties.Easy:
-        setWords(EASY_WORDS);
+        setWords(EASY_NOUNS);
+        AsyncStorage.getItem(`difficulty-${difficulty}-progress`).then((data) => {
+          if (data) {
+            setProgress(+data);
+          } else {
+            AsyncStorage.setItem(`difficulty-${difficulty}-progress`, '0');
+            setProgress(0);
+          }
+        });
         break;
       default:
         setWords(ALL_WORDS);
+        AsyncStorage.getItem(`difficulty-${difficulty}-progress`).then((data) => {
+          if (data) {
+            setProgress(+data);
+          } else {
+            AsyncStorage.setItem(`difficulty-${difficulty}-progress`, '0');
+            setProgress(0);
+          }
+        });
         break;
     }
-    console.log(difficulty);
   }, [difficulty]);
   return (
     <DifficultyContext.Provider
@@ -54,6 +76,10 @@ export function DifficultyProvider({ children }: DifficultyProviderProps) {
         difficulty: difficulty,
         allWords: ALL_WORDS,
         canBeUsedWords: words,
+        setProgress(progress) {
+          setProgress(progress);
+        },
+        progress,
       }}
     >
       {children}
