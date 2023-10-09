@@ -1,104 +1,91 @@
 import {
-  Button,
   FlatList,
-  Image,
   ImageBackground,
+  NativeScrollEvent,
   Pressable,
   StyleSheet,
   Text,
-  TouchableNativeFeedback,
   View,
   useWindowDimensions,
 } from 'react-native';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Difficulties, useDifficulty } from 'components/DifficultyProvider';
+import {
+  ALL_WORDS,
+  EASY_NOUNS,
+  HARD_NOUNS,
+  MEDIUM_NOUNS,
+  useDifficulty,
+} from 'components/DifficultyProvider';
 import { Theme } from 'assets/theme';
 import { getStoredStr, removeValue } from 'utils/asyncStorage';
+
+import DifficultyItem, { Difficultyitem } from 'components/Difficulty/DifficultyItem';
+import { Layout } from 'constants/layout';
+import { router } from 'expo-router';
 import { Progressbar } from 'components/Progressbar';
-import { useSharedValue, withTiming } from 'react-native-reanimated';
 
 const DIFFICULTIES = [
   {
     description: 'Толькі назоўнікі. Простыя словы.',
-    img: require('assets/sun.png'),
+    img: require('assets/imgs/sun.png'),
     name: 'Лёгкая',
   },
   {
     description: 'Усе часціны мовы. Простыя словы.',
-    img: require('assets/halfmoon.png'),
+    img: require('assets/imgs/halfmoon.png'),
     name: 'Сярэдняя',
   },
   {
     description: 'Усе часціны мовы. Толькі складаныя словы.',
-    img: require('assets/moon.png'),
+    img: require('assets/imgs/moon.png'),
     name: 'Складаная',
   },
   {
     description: 'Усе словы. Можа трапіцца як складанае, так і лёгкае слова.',
-    img: require('assets/flower.png'),
+    img: require('assets/imgs/flower.png'),
     name: 'Універсальная',
   },
 ];
 
-interface Difficultyitem {
-  img: number;
-  description: string;
-  name: string;
-}
-
-interface DifficultyItemProps extends Difficultyitem {
-  setDifficulty: (difficulty: Difficulties) => void;
-  difficultyIndex: number;
-  activeDifficulty: number;
-}
-
-const DifficultyItem = ({
-  description,
-  setDifficulty,
-  difficultyIndex,
-  activeDifficulty,
-  img,
-  name,
-}: DifficultyItemProps) => {
-  const isActive = activeDifficulty === difficultyIndex;
-  const { progress, canBeUsedWords } = useDifficulty();
-  const progressBar = useSharedValue(0);
-
-  useEffect(() => {
-    progressBar.value = withTiming((progress * 100) / canBeUsedWords.length, { duration: 300 });
-  }, [progress, canBeUsedWords]);
-
-  return (
-    <View style={styles.difficultyItemContainer}>
-      <View style={styles.difficultyItemContent}>
-        <Text style={[styles.title, styles.txt, isActive && styles.activeTxt]}>{name}</Text>
-        <Image style={styles.img} source={img} />
-        <Text style={[styles.txt, styles.body, isActive && styles.activeTxt]}>{description}</Text>
-      </View>
-      {isActive && (
-        <View>
-          <Text style={styles.txt}>Пройдено:</Text>
-          <Text style={styles.txt}>
-            {progress}/{canBeUsedWords.length}
-          </Text>
-          <Progressbar progress={progressBar} color="#F6E7BE" />
-        </View>
-      )}
-      <>
-        {isActive ? (
-          <Text style={[styles.txt, styles.label, styles.activeTxt]}>Абраная зараз</Text>
-        ) : (
-          <View></View>
-        )}
-      </>
-    </View>
-  );
-};
-
 const Difficulty = () => {
   const { difficulty, setDifficulty } = useDifficulty();
   const { width, height } = useWindowDimensions();
+  const [listIndex, setListIndex] = useState(0);
+  const [progress, setProgress] = useState(0);
+
+  const getDifficultyWordLength = (difficulty: number) => {
+    switch (difficulty) {
+      case 0:
+        return EASY_NOUNS.length;
+      case 1:
+        return MEDIUM_NOUNS.length;
+      case 2:
+        return HARD_NOUNS.length;
+      case 3:
+        return ALL_WORDS.length;
+      default:
+        return 1;
+    }
+  };
+  const total = getDifficultyWordLength(listIndex);
+
+  useEffect(() => {
+    getStoredStr(`difficulty-${listIndex}-progress`).then((data) => {
+      if (data) {
+        setProgress(+data);
+      } else {
+        setProgress(0);
+      }
+    });
+  }, [listIndex]);
+
+  const listRef = useRef<FlatList | null>(null);
+
+  useEffect(() => {
+    setListIndex(difficulty);
+  }, []);
+
   const renderItem = ({ item, index }: { item: Difficultyitem; index: number }) => {
     return (
       <View style={{ width }}>
@@ -106,7 +93,6 @@ const Difficulty = () => {
           description={item.description}
           name={item.name}
           img={item.img}
-          setDifficulty={setDifficulty}
           difficultyIndex={index}
           activeDifficulty={difficulty}
         />
@@ -114,26 +100,44 @@ const Difficulty = () => {
     );
   };
 
-  const listRef = useRef<FlatList | null>(null);
-
-  const listPosition = useRef(difficulty);
-
   const handleScrollForward = () => {
-    if (listPosition.current < DIFFICULTIES.length - 1) {
-      listRef.current?.scrollToIndex({ animated: true, index: listPosition.current + 1 });
-      listPosition.current++;
+    if (listIndex < DIFFICULTIES.length - 1) {
+      listRef.current?.scrollToIndex({ animated: true, index: listIndex + 1 });
+      setListIndex((prev) => prev + 1);
     }
   };
 
   const handleScrollBack = () => {
-    if (listPosition.current > 0) {
-      listRef.current?.scrollToIndex({ animated: true, index: listPosition.current - 1 });
-      listPosition.current--;
+    if (listIndex > 0) {
+      listRef.current?.scrollToIndex({ animated: true, index: listIndex - 1 });
+      setListIndex((prev) => prev - 1);
     }
   };
 
+  const onMomentumScrollEnd = ({ nativeEvent }: { nativeEvent: NativeScrollEvent }) => {
+    setListIndex(Math.round(nativeEvent.contentOffset.x / width));
+  };
+
+  const handleDifficultyChoice = () => {
+    setDifficulty(listIndex);
+    removeValue('target');
+    removeValue('word-rows');
+  };
+
   return (
-    <ImageBackground source={require('assets/background-stars.png')} style={styles.container}>
+    <ImageBackground source={require('assets/imgs/background-stars.png')} style={styles.container}>
+      <Ionicons
+        style={{
+          position: 'absolute',
+          top: Layout.mediumPadding + 4,
+          right: Layout.smallPadding,
+          zIndex: 100,
+        }}
+        name="exit-outline"
+        size={32}
+        color={'white'}
+        onPress={() => router.back()}
+      />
       <FlatList
         data={DIFFICULTIES}
         renderItem={renderItem}
@@ -143,33 +147,35 @@ const Difficulty = () => {
         ref={listRef}
         initialScrollIndex={difficulty}
         getItemLayout={(_, index) => ({ length: height, offset: width * index, index })}
-        onMomentumScrollEnd={({ nativeEvent }) => {
-          listPosition.current = Math.round(nativeEvent.contentOffset.x / width);
-        }}
+        onMomentumScrollEnd={onMomentumScrollEnd}
       />
-      <Ionicons
-        style={{ position: 'absolute', top: '50%', right: 8 }}
-        name="chevron-forward-circle-outline"
-        size={42}
-        color={'white'}
-        onPress={handleScrollForward}
-      />
-      <Ionicons
-        style={{ position: 'absolute', top: '50%', left: 8 }}
-        name="chevron-back-circle-outline"
-        size={42}
-        color={'white'}
-        onPress={handleScrollBack}
-      />
-      <View style={{ paddingHorizontal: 32 }}>
+      {listIndex !== 0 && (
+        <Ionicons
+          style={{ position: 'absolute', top: '50%', left: 8 }}
+          name="chevron-back-outline"
+          size={42}
+          color={'white'}
+          onPress={handleScrollBack}
+        />
+      )}
+      {listIndex !== DIFFICULTIES.length - 1 && (
+        <Ionicons
+          style={{ position: 'absolute', top: '50%', right: 8 }}
+          name="chevron-forward-outline"
+          size={42}
+          color={'white'}
+          onPress={handleScrollForward}
+        />
+      )}
+      <View style={styles.progressbarContainer}>
+        <Text style={[styles.txt, { fontSize: 20 }]}>Пройдзена:</Text>
+        <Progressbar color="#F6E7BE" current={progress} total={total} />
+      </View>
+      <View style={styles.btnContainer}>
         <Pressable
-          style={styles.btn}
-          onPress={() => {
-            setDifficulty(listPosition.current);
-
-            removeValue('target');
-            removeValue('word-rows');
-          }}
+          style={difficulty === listIndex ? [styles.btn, styles.disabledBtn] : styles.btn}
+          disabled={difficulty === listIndex}
+          onPress={handleDifficultyChoice}
         >
           <Text style={[styles.txt, styles.label]}>Выбраць</Text>
         </Pressable>
@@ -184,59 +190,37 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: 'black',
-    paddingBottom: 32,
-
-    paddingTop: 64,
+    paddingBottom: Layout.mediumPadding,
+    paddingTop: Layout.mediumPadding,
   },
   txt: {
     color: 'white',
     fontFamily: 'JetBrainsMono-Regular',
     textAlign: 'center',
   },
-  activeTxt: {
-    color: '#F6E7BE',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-  },
-  body: {
-    fontSize: 18,
-    fontWeight: '500',
-  },
-  difficultyItemContainer: {
-    flex: 1,
-
-    alignSelf: 'center',
-    paddingHorizontal: 32,
-    justifyContent: 'space-between',
-    paddingBottom: 16,
-    width: '80%',
-  },
-  difficultyItemContent: {
-    gap: 32,
-    alignItems: 'center',
+  btnContainer: {
+    paddingHorizontal: Layout.mediumPadding,
   },
   btn: {
-    paddingHorizontal: 24,
-    paddingVertical: 12,
+    paddingHorizontal: Layout.mediumPadding,
+    paddingVertical: Layout.extraSmallPadding,
     borderWidth: 1,
     borderColor: 'white',
-
-    backgroundColor: '#F6E7BE',
-    borderRadius: 15,
+    backgroundColor: Theme.colors.primary,
+    borderRadius: 8,
   },
-  activeDifficulty: {
-    backgroundColor: Theme.colors.correctLetter,
-  },
-  img: {
-    height: 130,
-    marginTop: 32,
-    resizeMode: 'contain',
+  disabledBtn: {
+    borderColor: Theme.colors.disabled,
+    backgroundColor: Theme.colors.disabled,
   },
   label: {
     fontSize: 16,
     fontWeight: '700',
     color: 'black',
+  },
+  progressbarContainer: {
+    gap: 4,
+    paddingHorizontal: 32,
+    marginBottom: Layout.largePadding,
   },
 });
