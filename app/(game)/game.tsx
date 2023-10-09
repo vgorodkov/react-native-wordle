@@ -1,41 +1,41 @@
 import { Alert, Button, ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSharedValue } from 'react-native-reanimated';
 import CustomKeyboard from 'components/Keyboard';
-import { Layout } from 'constants/layout';
-import { moderateScale } from 'utils/metrics';
+
 import { useDifficulty } from 'components/DifficultyProvider';
 
 import { WordRow } from 'components/Playground/WordRow';
 import { router } from 'expo-router';
-import { getRandomWord } from 'utils/getRandomWord';
 import { getStoredObj, getStoredStr, removeValue, storeObj, storeStr } from 'utils/asyncStorage';
 import { StatusBar } from 'expo-status-bar';
 import { Header } from 'components/Header';
 import * as Haptics from 'expo-haptics';
 import { Loading } from 'components/Loading';
 
-const Test = () => {
-  const { canBeUsedWords, allWords, progress } = useDifficulty();
+const NUM_ROWS = 6;
+const NUM_COLS = 5;
 
-  const [target, setTarget] = useState(canBeUsedWords[progress]);
+const Game = () => {
+  const INITIAL_EMPTY_WORDS = useMemo(
+    () => Array.from({ length: NUM_ROWS }, () => Array.from({ length: NUM_COLS }, () => '')),
+    [],
+  );
+
+  const { canBeUsedWords, allWords, progress } = useDifficulty();
+  const [target, setTarget] = useState(
+    progress < canBeUsedWords.length ? canBeUsedWords[progress] : 'кавун', //prevent going out of range.
+  );
   const [activeCol, setActiveCol] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
-
   const [correctLetters, setCorrectLetters] = useState(['', '', '', '', '']);
+  const [words, setWords] = useState(INITIAL_EMPTY_WORDS);
 
-  const [words, setWords] = useState([
-    ['', '', '', '', ''],
-    ['', '', '', '', ''],
-    ['', '', '', '', ''],
-    ['', '', '', '', ''],
-    ['', '', '', '', ''],
-    ['', '', '', '', ''],
-  ]);
   const currentRow = useRef(0);
   const currentCol = useRef(0);
   const hintWasUsed = useRef(false);
 
+  //for keyboard letters animation
   const usedLetters = useSharedValue<string>('');
   const shouldCheck = useSharedValue(false);
 
@@ -44,7 +44,7 @@ const Test = () => {
   const isExistingWord = allWords.includes(word);
   const isGameEnded = currentRow.current === 5;
   const isWordGuessed = word === target;
-  const hasGameStarted = words[0].join('').length === 5;
+  const hasGameStarted = words[0].join('').trim().length === 5;
 
   useEffect(() => {
     setIsLoading(true);
@@ -112,6 +112,7 @@ const Test = () => {
     setActiveCol(letterIndex);
   }, []);
 
+  //get correct letters which are displayed on active row
   const handleCorrectLetters = () => {
     for (let i = 0; i < word.length; i++) {
       if (word[i] === target[i]) {
@@ -138,6 +139,7 @@ const Test = () => {
           return updatedWords;
         });
         hintWasUsed.current = true;
+        storeStr('true', 'hint-used');
       }
     } else {
       Alert.alert('Пачакайце...', 'Вы ўжо выкарыстоўвалі падказку!');
@@ -176,7 +178,7 @@ const Test = () => {
   }
 
   return (
-    <ImageBackground source={require('assets/background-stars.png')} style={styles.container}>
+    <ImageBackground source={require('assets/imgs/background-stars.png')} style={styles.container}>
       <StatusBar hidden />
       <Header handleHint={handleHint} />
       <View>
@@ -205,7 +207,7 @@ const Test = () => {
   );
 };
 
-export default Test;
+export default Game;
 
 const styles = StyleSheet.create({
   container: {

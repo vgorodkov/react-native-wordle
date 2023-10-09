@@ -1,4 +1,4 @@
-import { StyleSheet, View, ImageBackground, Image, useWindowDimensions } from 'react-native';
+import { StyleSheet, View, ImageBackground, useWindowDimensions, Alert } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
 import { Link, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
@@ -10,25 +10,26 @@ import Animated, {
   useSharedValue,
   withRepeat,
   withSequence,
-  withSpring,
   withTiming,
 } from 'react-native-reanimated';
 import { getStoredStr } from 'utils/asyncStorage';
+import { scale } from 'utils/metrics';
+import { Difficulty_Imgs, backgroundImage } from 'assets/imgs';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 SplashScreen.preventAutoHideAsync();
 
 const ANIMATION_DURATION = 40000;
+const IMG_SIZE = scale(100);
 
 const Start = () => {
+  const { width } = useWindowDimensions();
+  const { difficulty, isPlayable } = useDifficulty();
   const [fontsLoaded, fontError] = useFonts({
     'JetBrainsMono-Regular': require('assets/fonts/JetBrainsMono-Regular.ttf'),
     'JetBrainsMono-Bold': require('assets/fonts/JetBrainsMono-Bold.ttf'),
     'JetBrainsMono-Medium': require('assets/fonts/JetBrainsMono-Medium.ttf'),
   });
-
-  const { difficulty } = useDifficulty();
-
-  const { width } = useWindowDimensions();
 
   const translateY = useSharedValue(0);
   const translateX = useSharedValue(0);
@@ -43,7 +44,7 @@ const Start = () => {
     if (fontsLoaded && !fontError) {
       translateX.value = withRepeat(
         withSequence(
-          withTiming(width - 100, { duration: ANIMATION_DURATION }),
+          withTiming(width - IMG_SIZE, { duration: ANIMATION_DURATION }),
           withTiming(0, { duration: ANIMATION_DURATION }),
         ),
         -1,
@@ -56,29 +57,13 @@ const Start = () => {
         ),
         -1,
       );
+      getStoredStr('rules-opened').then((data) => {
+        if (!data) {
+          router.push('rules');
+        }
+      });
     }
-
-    getStoredStr('rules-opened').then((data) => {
-      if (!data && fontsLoaded && !fontError) {
-        router.push('rules');
-      }
-    });
   }, [fontsLoaded, fontError]);
-
-  const getDifficultyImg = (difficulty: number) => {
-    switch (difficulty) {
-      case 0:
-        return require('assets/sun.png');
-      case 1:
-        return require('assets/halfmoon.png');
-      case 2:
-        return require('assets/moon.png');
-      case 3:
-        return require('assets/flower.png');
-      default:
-        return require('assets/sun.png');
-    }
-  };
 
   const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded || fontError) {
@@ -86,30 +71,52 @@ const Start = () => {
     }
   }, [fontsLoaded, fontError]);
 
+  const getDifficultyImg = (difficulty: number) => {
+    switch (difficulty) {
+      case 0:
+        return Difficulty_Imgs.difficulty_0;
+      case 1:
+        return Difficulty_Imgs.difficulty_1;
+      case 2:
+        return Difficulty_Imgs.difficulty_2;
+      case 3:
+        return Difficulty_Imgs.difficulty_3;
+      default:
+        return Difficulty_Imgs.difficulty_0;
+    }
+  };
+
+  const handlePlayBtn = () => {
+    if (!isPlayable) {
+      Alert.alert(
+        'Абярыце іншую складанасць!',
+        'Падаецца, Вы прайшлі ўсе ўзроўні на гэтай складанасці. Вы можаце выбраць іншую складанасць і працягнуць гуляць.',
+        [
+          {
+            text: 'Выбраць складанасць',
+            onPress: () => {
+              router.push('difficulty');
+            },
+          },
+          { text: 'Ok', onPress: () => {} },
+        ],
+      );
+    }
+  };
+
   if (!fontsLoaded && !fontError) {
-    return (
-      <ImageBackground
-        resizeMode="cover"
-        style={styles.bgImg}
-        source={require('assets/background-stars.png')}
-      />
-    );
+    return <ImageBackground resizeMode="cover" style={styles.bgImg} source={backgroundImage} />;
   }
 
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
-      <StatusBar translucent style="light" />
-
-      <ImageBackground
-        resizeMode="cover"
-        style={styles.bgImg}
-        source={require('../src/assets/background-stars.png')}
-      >
+      <StatusBar hidden />
+      <ImageBackground resizeMode="cover" style={styles.bgImg} source={backgroundImage}>
         <Animated.Image
           style={[styles.difficultyImg, animatedImage]}
           source={getDifficultyImg(difficulty)}
         />
-        <Link style={styles.playBtn} href={'/game'}>
+        <Link style={styles.playBtn} onPress={handlePlayBtn} href={!isPlayable ? '' : '/game'}>
           Гуляць
         </Link>
         <Link style={styles.txt} href={'/difficulty'}>
@@ -149,7 +156,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 64,
     left: 64,
-    width: 100,
+    height: IMG_SIZE,
     resizeMode: 'contain',
+    width: IMG_SIZE,
   },
 });

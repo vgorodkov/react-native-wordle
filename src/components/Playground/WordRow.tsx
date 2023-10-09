@@ -49,9 +49,10 @@ export const WordRow = memo(
           } else {
             return (
               <Letter
-                activeCol={activeCol}
+                isActiveCol={activeCol === index}
+                isActiveRow={isActive}
                 letterIndex={index}
-                onWordLetter={isActive ? onWordLetter : () => {}}
+                onWordLetter={onWordLetter}
                 letter={item}
                 key={index}
                 color={colors[index]}

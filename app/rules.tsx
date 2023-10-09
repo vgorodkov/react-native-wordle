@@ -21,7 +21,7 @@ const Rules = () => {
     storeStr('true', 'rules-opened');
   }, []);
   return (
-    <ImageBackground source={require('assets/background-stars.png')} style={styles.container}>
+    <ImageBackground source={require('assets/imgs/background-stars.png')} style={styles.container}>
       <StatusBar translucent style="light" />
       <Link asChild href={'/'}>
         <Ionicons style={styles.backBtn} size={32} color={'white'} name="exit-outline" />

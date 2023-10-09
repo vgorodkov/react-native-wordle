@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { ReactNode, useEffect } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { getStoredStr } from 'utils/asyncStorage';
 
 export enum Difficulties {
@@ -16,6 +16,7 @@ interface DifficultyContextValue {
   allWords: string[];
   progress: number;
   setProgress: (progress: number) => void;
+  isPlayable: boolean;
 }
 
 const DifficultyContext = React.createContext<DifficultyContextValue | null>(null);
@@ -33,40 +34,50 @@ interface DifficultyProviderProps {
 }
 
 export const ALL_WORDS = require('data/be-5.json');
-const EASY_WORDS = require('data/shuffled-easy.json');
+
 export const EASY_NOUNS = require('data/be-5-easy-nouns.json');
+export const MEDIUM_NOUNS = require('data/be-5-medium-nouns.json');
+export const HARD_NOUNS = require('data/be-5-hard-nouns.json');
 
 export function DifficultyProvider({ children }: DifficultyProviderProps) {
-  const [difficulty, setDifficulty] = React.useState(Difficulties.Easy);
-  const [words, setWords] = React.useState(ALL_WORDS);
-  const [progress, setProgress] = React.useState(0);
+  const [difficulty, setDifficulty] = useState(Difficulties.Easy);
+  const [words, setWords] = useState(ALL_WORDS);
+  const [progress, setProgress] = useState(0);
+
+  const isPlayable = progress < words.length;
+
+  const handleStoredProgress = () => {
+    AsyncStorage.getItem(`difficulty-${difficulty}-progress`).then((data) => {
+      if (data) {
+        setProgress(+data);
+      } else {
+        AsyncStorage.setItem(`difficulty-${difficulty}-progress`, '0');
+        setProgress(0);
+      }
+    });
+  };
 
   useEffect(() => {
     switch (difficulty) {
       case Difficulties.Easy:
         setWords(EASY_NOUNS);
-        AsyncStorage.getItem(`difficulty-${difficulty}-progress`).then((data) => {
-          if (data) {
-            setProgress(+data);
-          } else {
-            AsyncStorage.setItem(`difficulty-${difficulty}-progress`, '0');
-            setProgress(0);
-          }
-        });
+        handleStoredProgress();
+        break;
+      case Difficulties.Medium:
+        setWords(MEDIUM_NOUNS);
+        handleStoredProgress();
+        break;
+      case Difficulties.Hard:
+        setWords(HARD_NOUNS);
+        handleStoredProgress();
         break;
       default:
         setWords(ALL_WORDS);
-        AsyncStorage.getItem(`difficulty-${difficulty}-progress`).then((data) => {
-          if (data) {
-            setProgress(+data);
-          } else {
-            AsyncStorage.setItem(`difficulty-${difficulty}-progress`, '0');
-            setProgress(0);
-          }
-        });
+        handleStoredProgress();
         break;
     }
   }, [difficulty]);
+
   return (
     <DifficultyContext.Provider
       value={{
@@ -80,6 +91,7 @@ export function DifficultyProvider({ children }: DifficultyProviderProps) {
           setProgress(progress);
         },
         progress,
+        isPlayable,
       }}
     >
       {children}

@@ -6,25 +6,29 @@ import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated
 
 interface LetterProps {
   letter: string;
-  color: SharedValue<string>;
   onWordLetter: (letterIndex: number) => void;
   letterIndex: number;
-  activeCol: number;
+  isActiveRow: boolean;
+  isActiveCol: boolean;
+  color: SharedValue<string>;
 }
 
 export const Letter = memo(
-  ({ letter, color, letterIndex, onWordLetter, activeCol }: LetterProps) => {
-    const isActive = activeCol === letterIndex;
-
+  ({ letter, letterIndex, onWordLetter, isActiveCol, isActiveRow, color }: LetterProps) => {
     const aStyle = useAnimatedStyle(() => {
       return {
         backgroundColor: color.value,
       };
     });
+
     return (
-      <Pressable onPress={() => onWordLetter(letterIndex)}>
+      <Pressable onPress={() => (isActiveRow ? onWordLetter(letterIndex) : {})}>
         <Animated.View
-          style={[styles.wordBox, aStyle, isActive && { borderWidth: 3, borderColor: '#F6E7BE' }]}
+          style={[
+            styles.wordBox,
+            aStyle,
+            isActiveCol && { borderWidth: 3, borderColor: '#F6E7BE' },
+          ]}
         >
           <Text style={styles.letter}>{letter.toUpperCase()}</Text>
         </Animated.View>

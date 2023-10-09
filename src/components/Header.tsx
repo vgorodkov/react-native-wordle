@@ -40,7 +40,7 @@ export const Header = memo(({ handleHint }: HeaderProps) => {
       </View>
       <TouchableOpacity onPress={handleHint}>
         <Image
-          source={require('assets/bulb_2.png')}
+          source={require('assets/imgs/hint_bulb.png')}
           style={{ width: 32, resizeMode: 'contain', height: 32 }}
         />
       </TouchableOpacity>

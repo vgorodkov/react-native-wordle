@@ -1,7 +1,7 @@
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
-import { moderateScale, scale, verticalScale } from 'utils/metrics';
+import { moderateScale } from 'utils/metrics';
 import { Layout } from 'constants/layout';
 
 interface KeyboardLetter {
