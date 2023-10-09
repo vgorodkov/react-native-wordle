@@ -1,4 +1,4 @@
-import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, ImageBackground, Pressable, StyleSheet, Text, View, Image } from 'react-native';
 import React, { useEffect, useRef } from 'react';
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
@@ -10,19 +10,30 @@ import { StatusBar } from 'expo-status-bar';
 import { Progressbar } from 'components/Progressbar';
 import { useSharedValue, withSpring } from 'react-native-reanimated';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { scale } from 'utils/metrics';
+import { Result_Imgs, backgroundImage } from 'assets/imgs';
 
 const Result = () => {
   const { target, isWordGuessed } = useLocalSearchParams();
 
-  const { difficulty, setProgress, progress } = useDifficulty();
+  const { difficulty, setProgress, progress, isPlayable } = useDifficulty();
   const totalLength = EASY_NOUNS.length;
   const progressbarValue = useSharedValue(0);
 
   useEffect(() => {
-    removeValue('words');
-    if (isWordGuessed) {
+    const storeProgress = () => {
       setProgress(progress + 1);
       AsyncStorage.setItem(`difficulty-${difficulty}-progress`, (progress + 1).toString());
+    };
+
+    removeValue('words');
+
+    //for some reason expo router casts params to string
+    if (isWordGuessed === 'true') {
+      storeProgress();
+    } else {
+      //return to incorrect words when others are guessed. Perhaps, store incorrect words in asyncStorage and if other words is completed pull from async
+      storeProgress();
     }
     progressbarValue.value = withSpring((progress * 100) / totalLength, { duration: 300 });
   }, []);
@@ -31,19 +42,42 @@ const Result = () => {
     router.back();
   };
 
+  const handleNextGame = () => {
+    if (isPlayable) {
+      router.replace('/game');
+    } else {
+      Alert.alert(
+        'Абярыце іншую складанасць!',
+        'Падаецца, Вы прайшлі ўсе ўзроўні на гэтай складанасці. Вы можаце выбраць іншую складанасць і працягнуць гуляць.',
+        [
+          {
+            text: 'Выбраць складанасць',
+            onPress: () => {
+              router.replace('difficulty');
+            },
+          },
+          {
+            text: 'Ok',
+            onPress: () => {
+              router.back();
+            },
+          },
+        ],
+      );
+    }
+  };
+
   return (
-    <ImageBackground
-      style={styles.container}
-      imageStyle={{ flex: 1 }}
-      source={require('assets/background-stars.png')}
-    >
+    <ImageBackground style={styles.container} imageStyle={{ flex: 1 }} source={backgroundImage}>
       <StatusBar hidden />
-      <LottieView
-        style={{ position: 'absolute', top: -100 }}
-        source={require('assets/animation.json')}
-        loop={false}
-        autoPlay
-      />
+      {isWordGuessed === 'true' && (
+        <LottieView
+          style={{ position: 'absolute', top: -100 }}
+          source={require('assets/lotties/animation.json')}
+          loop={false}
+          autoPlay
+        />
+      )}
       <View style={styles.header}>
         <Ionicons name="arrow-back-outline" color={'white'} size={32} onPress={handleExit} />
         <Text style={styles.headerTxt}>Лёгкая</Text>
@@ -51,13 +85,17 @@ const Result = () => {
       </View>
 
       <View style={styles.mainContainer}>
+        <Image
+          style={{ alignSelf: 'center', width: scale(100), height: scale(100), aspectRatio: 1 }}
+          source={isWordGuessed === 'true' ? Result_Imgs.succes : Result_Imgs.failure}
+        />
         <Text
           style={[
             styles.txt,
             { alignSelf: 'center', fontFamily: 'JetBrainsMono-Medium', fontSize: 24 },
           ]}
         >
-          Вы прошли!
+          {isWordGuessed === 'true' ? 'Вы прайшлі!' : 'Вы не прайшлі!'}
         </Text>
         <View style={styles.mainContent}>
           <Text style={styles.txt}>Правильное слово:</Text>
@@ -81,7 +119,7 @@ const Result = () => {
           <Text style={[styles.btnTxt, styles.txtBtnTxt]}>Значение слова</Text>
         </Pressable>
         <Pressable
-          onPress={() => router.replace('/game')}
+          onPress={handleNextGame}
           style={({ pressed }) =>
             pressed ? [styles.btn, styles.fillBtn, { opacity: 0.7 }] : [styles.btn, styles.fillBtn]
           }
