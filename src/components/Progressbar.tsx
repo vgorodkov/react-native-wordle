@@ -1,25 +1,35 @@
 import { StyleSheet, Text, View } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import Animated, {
   Easing,
   SharedValue,
   useAnimatedStyle,
+  useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
 
 interface ProgressbarProps {
-  progress: SharedValue<number>;
+  progress?: SharedValue<number>;
   color?: string;
-  current?: string | number;
-  total?: string | number;
+  current: string | number;
+  total: string | number;
 }
 
-export const Progressbar = ({ progress, color = '#B32926', current, total }: ProgressbarProps) => {
+export const Progressbar = ({ color = '#B32926', current, total }: ProgressbarProps) => {
+  const progress = useSharedValue(0);
   const progressBarAnimatedStyle = useAnimatedStyle(() => {
     return {
-      width: withTiming(`${progress.value}%`, { duration: 500, easing: Easing.out(Easing.cubic) }),
+      width: `${progress.value}%`,
     };
   });
+
+  useEffect(() => {
+    progress.value = withTiming((+current * 100) / +total, {
+      duration: 500,
+      easing: Easing.out(Easing.cubic),
+    });
+  }, [current]);
+
   return (
     <View>
       <View style={[styles.progressbar, styles.backgroundProgressbar]} />
@@ -39,7 +49,7 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   backgroundProgressbar: {
-    backgroundColor: '#A9A9A9',
+    backgroundColor: 'gray',
     position: 'absolute',
     width: '100%',
     borderRadius: 4,
@@ -48,7 +58,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     alignSelf: 'center',
     fontSize: 12,
-    color: 'white',
+    color: 'black',
     fontFamily: 'JetBrainsMono-Bold',
   },
 });
