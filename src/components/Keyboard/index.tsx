@@ -4,9 +4,54 @@ import { SharedValue, runOnJS, useAnimatedReaction, useSharedValue } from 'react
 import { handleKeyboardLetterAnimation } from 'utils/handleKeyboardLetter';
 import { handleWordCheck } from 'utils/handleWordCheck';
 import { KeyboardLetter } from './KeyboardLetter';
-import { Layout } from 'constants/layout';
-import { verticalScale } from 'utils/metrics';
-import { getStoredObj, getStoredStr, storeObj, storeStr } from 'utils/asyncStorage';
+import { UniqueLetters } from '../../../app/(game)/game';
+import { getStoredObj, storeObj } from 'utils/asyncStorage';
+
+const { width } = Dimensions.get('window');
+
+const handleUniqueLetters = (
+  uniqueLetters: MutableRefObject<{ correct: string[]; inWord: string[]; notInWord: string[] }>,
+  newLetters: { correct: string[]; inWord: string[]; notInWord: string[] },
+) => {
+  'worklet';
+  for (const [key, value] of Object.entries(newLetters)) {
+    switch (key) {
+      case 'correct':
+        value.forEach((letter) => {
+          if (!uniqueLetters.current.correct.includes(letter)) {
+            uniqueLetters.current.correct.push(letter);
+            if (uniqueLetters.current.inWord.includes(letter)) {
+              uniqueLetters.current.inWord.splice(0, 1);
+            }
+          }
+        });
+        break;
+      case 'inWord':
+        value.forEach((letter) => {
+          if (
+            !uniqueLetters.current.correct.includes(letter) &&
+            !uniqueLetters.current.inWord.includes(letter)
+          ) {
+            uniqueLetters.current.inWord.push(letter);
+          }
+        });
+        break;
+      case 'notInWord':
+        value.forEach((letter) => {
+          if (
+            !uniqueLetters.current.correct.includes(letter) &&
+            !uniqueLetters.current.inWord.includes(letter) &&
+            !uniqueLetters.current.notInWord.includes(letter)
+          ) {
+            uniqueLetters.current.notInWord.push(letter);
+          }
+        });
+        break;
+      default:
+        break;
+    }
+  }
+};
 
 interface CustomKeyboardProps {
   onLetterPress: (letter: string) => void;
@@ -16,49 +61,6 @@ interface CustomKeyboardProps {
   handleLetterDelete: () => void;
   handleLongLetterDelete: () => void;
 }
-
-const { width } = Dimensions.get('window');
-
-const handleUniqueLetters = (
-  uniqueLetters: { correct: string[]; inWord: string[]; notInWord: string[] },
-  newLetters: { correct: string[]; inWord: string[]; notInWord: string[] },
-) => {
-  'worklet';
-  for (const [key, value] of Object.entries(newLetters)) {
-    switch (key) {
-      case 'correct':
-        value.forEach((letter) => {
-          if (!uniqueLetters.correct.includes(letter)) {
-            uniqueLetters.correct.push(letter);
-            if (uniqueLetters.inWord.includes(letter)) {
-              uniqueLetters.inWord.splice(0, 1);
-            }
-          }
-        });
-        break;
-      case 'inWord':
-        value.forEach((letter) => {
-          if (!uniqueLetters.correct.includes(letter) && !uniqueLetters.inWord.includes(letter)) {
-            uniqueLetters.inWord.push(letter);
-          }
-        });
-        break;
-      case 'notInWord':
-        value.forEach((letter) => {
-          if (
-            !uniqueLetters.correct.includes(letter) &&
-            !uniqueLetters.inWord.includes(letter) &&
-            !uniqueLetters.notInWord.includes(letter)
-          ) {
-            uniqueLetters.notInWord.push(letter);
-          }
-        });
-        break;
-      default:
-        break;
-    }
-  }
-};
 
 const CustomKeyboard: React.FC<CustomKeyboardProps> = memo(
   ({
@@ -70,7 +72,8 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = memo(
     handleLongLetterDelete,
   }) => {
     const rows = ["йцукенгшўзх'", 'фывапролджэ', 'ячсмітьбю'];
-    const [uniqueLetters, setUniqueLetters] = useState<{
+
+    const uniqueLetters = useRef<{
       correct: string[];
       inWord: string[];
       notInWord: string[];
@@ -80,7 +83,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = memo(
       notInWord: [],
     });
     const colors = rows.map((item) => item.split('').map(() => useSharedValue('#363229')));
-
+    let isUsed = false;
     const handleLetterLongPress = (letter: string) => {
       if (letter === 'е') {
         onLetterPress('ё');
@@ -95,7 +98,7 @@ const CustomKeyboard: React.FC<CustomKeyboardProps> = memo(
           const letters = handleWordCheck(usedLetters.value, target);
           handleUniqueLetters(uniqueLetters, letters);
 
-          for (const [key, value] of Object.entries(uniqueLetters)) {
+          for (const [key, value] of Object.entries(uniqueLetters.current)) {
             handleKeyboardLetterAnimation(value, rows, colors, key);
           }
 
