@@ -10,13 +10,7 @@ import {
 } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import {
-  ALL_WORDS,
-  EASY_NOUNS,
-  HARD_NOUNS,
-  MEDIUM_NOUNS,
-  useDifficulty,
-} from 'components/DifficultyProvider';
+
 import { Theme } from 'assets/theme';
 import { getStoredStr, removeValue } from 'utils/asyncStorage';
 
@@ -24,6 +18,9 @@ import DifficultyItem, { Difficultyitem } from 'components/Difficulty/Difficulty
 import { Layout } from 'constants/layout';
 import { router } from 'expo-router';
 import { Progressbar } from 'components/Progressbar';
+import { useDispatch, useSelector } from 'react-redux';
+import { Difficulties, WORDS_BY_DIFFICULTY, changeDifficulty } from 'redux/slices/difficultySlice';
+import { RootState } from 'redux/store';
 
 const DIFFICULTIES = [
   {
@@ -49,36 +46,21 @@ const DIFFICULTIES = [
 ];
 
 const Difficulty = () => {
-  const { difficulty, setDifficulty } = useDifficulty();
+  const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
+
+  const progresses = useSelector((state: RootState) => state.difficulty.difficulties);
+
   const { width, height } = useWindowDimensions();
   const [listIndex, setListIndex] = useState(0);
-  const [progress, setProgress] = useState(0);
 
-  const getDifficultyWordLength = (difficulty: number) => {
-    switch (difficulty) {
-      case 0:
-        return EASY_NOUNS.length;
-      case 1:
-        return MEDIUM_NOUNS.length;
-      case 2:
-        return HARD_NOUNS.length;
-      case 3:
-        return ALL_WORDS.length;
-      default:
-        return 1;
-    }
+  const dispatch = useDispatch();
+
+  const progress = progresses[listIndex].currentProgress;
+
+  const getDifficultyWordLength = (difficulty: Difficulties) => {
+    return WORDS_BY_DIFFICULTY[difficulty].length;
   };
   const total = getDifficultyWordLength(listIndex);
-
-  useEffect(() => {
-    getStoredStr(`difficulty-${listIndex}-progress`).then((data) => {
-      if (data) {
-        setProgress(+data);
-      } else {
-        setProgress(0);
-      }
-    });
-  }, [listIndex]);
 
   const listRef = useRef<FlatList | null>(null);
 
@@ -119,7 +101,7 @@ const Difficulty = () => {
   };
 
   const handleDifficultyChoice = () => {
-    setDifficulty(listIndex);
+    dispatch(changeDifficulty(listIndex));
     removeValue('target');
     removeValue('word-rows');
   };

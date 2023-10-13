@@ -1,17 +1,33 @@
-import { Alert, Button, ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSharedValue } from 'react-native-reanimated';
-import CustomKeyboard from 'components/Keyboard';
+import { Alert, ImageBackground, StyleSheet, View } from 'react-native';
+import React, { useEffect, useMemo, useRef } from 'react';
 
-import { useDifficulty } from 'components/DifficultyProvider';
+import AnotherKeyboard from 'components/AnotherKeyboard';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'redux/store';
 
-import { WordRow } from 'components/Playground/WordRow';
-import { router } from 'expo-router';
-import { getStoredObj, getStoredStr, removeValue, storeObj, storeStr } from 'utils/asyncStorage';
-import { StatusBar } from 'expo-status-bar';
+import { backgroundImage } from 'assets/imgs';
 import { Header } from 'components/Header';
-import * as Haptics from 'expo-haptics';
-import { Loading } from 'components/Loading';
+import { Row } from 'components/Game/WordRow';
+import { router } from 'expo-router';
+import {
+  moveToNextRow,
+  resetGame,
+  setCorrectLetters,
+  setHintWasUsed,
+} from 'redux/slices/gameSlice';
+import { useSharedValue } from 'react-native-reanimated';
+import { Difficulties, WORDS_BY_DIFFICULTY } from 'redux/slices/difficultySlice';
+import { handleWordCheck } from 'utils/handleWordCheck';
+
+const getCorrectLetters = (target: string, word: string) => {
+  const correctLetters = ['', '', '', '', ''];
+  for (let i = 0; i < target.length; i++) {
+    if (target[i] === word[i]) {
+      correctLetters[i] = target[i];
+    }
+  }
+  return correctLetters;
+};
 
 const NUM_ROWS = 6;
 const NUM_COLS = 5;
@@ -22,187 +38,73 @@ const Game = () => {
     [],
   );
 
-  const { canBeUsedWords, allWords, progress } = useDifficulty();
-  const [target, setTarget] = useState(
-    progress < canBeUsedWords.length ? canBeUsedWords[progress] : 'кавун', //prevent going out of range.
-  );
-  const [activeCol, setActiveCol] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
-  const [correctLetters, setCorrectLetters] = useState(['', '', '', '', '']);
-  const [words, setWords] = useState(INITIAL_EMPTY_WORDS);
+  const dispatch = useDispatch();
 
-  const currentRow = useRef(0);
-  const currentCol = useRef(0);
-  const hintWasUsed = useRef(false);
+  const currentRow = useSelector((state: RootState) => state.game.currentRow);
+  const currentCol = useSelector((state: RootState) => state.game.currentCol);
+  const targetWord = useSelector((state: RootState) => state.difficulty.currentWord);
+  const isGameEnded = useSelector((state: RootState) => state.game.isGameEnded);
+  const words = useSelector((state: RootState) => state.game.words);
+  const word = useSelector((state: RootState) => state.game.currentWord);
+  const correctLetters = useSelector((state: RootState) => state.game.correctLetters);
+  const hintWasUsed = useSelector((state: RootState) => state.game.hintWasUsed);
 
-  //for keyboard letters animation
-  const usedLetters = useSharedValue<string>('');
-  const shouldCheck = useSharedValue(false);
+  const isWordGuessed = word === targetWord;
 
-  const word = words[currentRow.current].join('');
-  const isLongEnough = word.length === 5;
-  const isExistingWord = allWords.includes(word);
-  const isGameEnded = currentRow.current === 5;
-  const isWordGuessed = word === target;
-  const hasGameStarted = words[0].join('').trim().length === 5;
-
-  useEffect(() => {
-    setIsLoading(true);
-    getStoredObj('words')
-      .then((data) => {
-        if (data) {
-          setWords(data);
-        }
-      })
-      .finally(() => setIsLoading(false));
-  }, []);
-
-  const addLetter = useCallback((letter: string) => {
-    setWords((prevWord) => {
-      if (prevWord[currentRow.current].join('').length < 5 && currentCol.current < 5) {
-        const updatedWord = [...prevWord];
-        updatedWord[currentRow.current][currentCol.current] = letter;
-        return updatedWord;
-      } else {
-        return prevWord;
-      }
-    });
-    setActiveCol((prevCol) => {
-      if (prevCol < 4) {
-        currentCol.current++;
-        return prevCol + 1;
-      } else {
-        return prevCol;
-      }
-    });
-  }, []);
-
-  const handleLetterDelete = useCallback(() => {
-    setWords((prevWords) => {
-      const updatedWords = [...prevWords];
-      const row = updatedWords[currentRow.current];
-
-      if (row.join('').length > 0) {
-        if (row[currentCol.current] !== '') {
-          row[currentCol.current] = '';
-        } else if (currentCol.current > 0) {
-          row[currentCol.current - 1] = '';
-          currentCol.current--;
-        }
-        return updatedWords;
-      } else {
-        return prevWords;
-      }
-    });
-    setActiveCol(currentCol.current);
-  }, []);
-
-  const handleLongLetterDelete = useCallback(() => {
-    setWords((prevWords) => {
-      const updatedWords = [...prevWords];
-      updatedWords[currentRow.current] = ['', '', '', '', ''];
-      currentCol.current = 0;
-      return updatedWords;
-    });
-    setActiveCol(currentCol.current);
-  }, []);
-
-  const onWordLetter = useCallback((letterIndex: number) => {
-    currentCol.current = letterIndex;
-    setActiveCol(letterIndex);
-  }, []);
-
-  //get correct letters which are displayed on active row
-  const handleCorrectLetters = () => {
-    for (let i = 0; i < word.length; i++) {
-      if (word[i] === target[i]) {
-        setCorrectLetters((prev) => {
-          const updatedLetters = [...prev];
-          updatedLetters[i] = target[i];
-          return updatedLetters;
-        });
-      }
-    }
+  const wordsRef = useRef(words);
+  console.log(targetWord);
+  const handleGameEnd = (isGuessed: boolean) => {
+    router.replace({ pathname: '/result', params: { targetWord, isWordGuessed: isGuessed } });
+    dispatch(resetGame());
   };
 
-  const handleHint = useCallback(() => {
-    if (!hintWasUsed.current) {
-      if (!correctLetters.includes(target[currentCol.current])) {
-        setCorrectLetters((prev) => {
-          const updatedLetters = [...prev];
-          updatedLetters[currentCol.current] = target[currentCol.current];
-          return updatedLetters;
-        });
-        setWords((prev) => {
-          const updatedWords = [...prev];
-          updatedWords[currentRow.current][currentCol.current] = '';
-          return updatedWords;
-        });
-        hintWasUsed.current = true;
-        storeStr('true', 'hint-used');
-      }
+  const handleHint = () => {
+    if (!hintWasUsed) {
+      const updatedCorrectLetters = [...correctLetters];
+      const letterToShow = targetWord[currentCol];
+      updatedCorrectLetters[currentCol] = letterToShow;
+      dispatch(setCorrectLetters(updatedCorrectLetters));
+      dispatch(setHintWasUsed());
     } else {
       Alert.alert('Пачакайце...', 'Вы ўжо выкарыстоўвалі падказку!');
     }
-  }, []);
-
-  const handleGameEnd = (isWordGuessed: boolean) => {
-    router.replace({ pathname: '/result', params: { target, isWordGuessed } });
   };
 
-  if ((isGameEnded || isWordGuessed) && isLongEnough && isExistingWord) {
-    setTimeout(() => handleGameEnd(isWordGuessed), 300 * word.length);
+  if (isGameEnded) {
+    setTimeout(() => handleGameEnd(false), 300 * NUM_COLS);
   }
 
-  //get to new Row if word is correct
-  if (isLongEnough && isExistingWord && currentRow.current < 5) {
-    usedLetters.value = word;
-    shouldCheck.value = true;
-    currentCol.current = 0;
-    currentRow.current++;
-    handleCorrectLetters();
-    setActiveCol(currentCol.current);
-    if (hasGameStarted) {
-      storeObj(words, 'words');
+  if (isWordGuessed) {
+    setTimeout(() => handleGameEnd(true), 300 * NUM_COLS);
+  }
+
+  useEffect(() => {
+    if (word.length === 5) {
+      if (WORDS_BY_DIFFICULTY[Difficulties.Universal].includes(word)) {
+        const correctLetters = getCorrectLetters(targetWord, word);
+        dispatch(setCorrectLetters(correctLetters));
+        dispatch(moveToNextRow());
+      } else {
+      }
     }
-  }
-
-  if (isLongEnough && isExistingWord) {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-  } else if (isLongEnough) {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
-  }
-
-  if (isLoading) {
-    return <Loading />;
-  }
+  }, [word]);
 
   return (
-    <ImageBackground source={require('assets/imgs/background-stars.png')} style={styles.container}>
-      <StatusBar hidden />
+    <ImageBackground source={backgroundImage} style={styles.container}>
       <Header handleHint={handleHint} />
       <View>
-        {words.map((item, index) => (
-          <WordRow
-            onWordLetter={onWordLetter}
+        {INITIAL_EMPTY_WORDS.map((item, index) => (
+          <Row
+            target={targetWord}
+            currentCol={currentRow === index ? currentCol : -1}
+            isActive={currentRow === index}
+            key={index}
             letters={item}
-            key={item.toString() + index} //use this in oreder to trigger rerender when letter is deleted and activeCol is the same
-            correctLetters={currentRow.current === index ? correctLetters : null}
-            target={target}
-            activeCol={currentRow.current === index ? activeCol : -1}
-            isActive={currentRow.current === index}
+            rowIndex={index}
           />
         ))}
       </View>
-
-      <CustomKeyboard
-        onLetterPress={addLetter}
-        shouldCheck={shouldCheck}
-        usedLetters={usedLetters}
-        handleLongLetterDelete={handleLongLetterDelete}
-        handleLetterDelete={handleLetterDelete}
-        target={target}
-      />
+      <AnotherKeyboard target={targetWord} wordsRef={wordsRef} />
     </ImageBackground>
   );
 };
@@ -215,6 +117,5 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingTop: 16,
-    backgroundColor: 'gray',
   },
 });

@@ -3,14 +3,18 @@ import React, { memo } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
 import { useDifficulty } from './DifficultyProvider';
+import { useSelector } from 'react-redux';
+import { RootState } from 'redux/store';
 
 interface HeaderProps {
   handleHint: () => void;
 }
 
 export const Header = memo(({ handleHint }: HeaderProps) => {
-  const { difficulty, progress } = useDifficulty();
-
+  const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
+  const progress = useSelector(
+    (state: RootState) => state.difficulty.difficulties[difficulty].currentProgress,
+  );
   const handleDifficultyName = () => {
     switch (difficulty) {
       case 0:

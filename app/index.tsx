@@ -1,10 +1,5 @@
-import { StyleSheet, View, ImageBackground, useWindowDimensions, Alert } from 'react-native';
 import React, { useCallback, useEffect } from 'react';
-import { Link, router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
-import { useFonts } from 'expo-font';
-import * as SplashScreen from 'expo-splash-screen';
-import { useDifficulty } from 'components/DifficultyProvider';
+import { View, ImageBackground, useWindowDimensions, Alert, StyleSheet } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -12,19 +7,35 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
+import { useSelector } from 'react-redux';
+import { Link, router } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
+import * as SplashScreen from 'expo-splash-screen';
+
 import { getStoredStr } from 'utils/asyncStorage';
 import { scale } from 'utils/metrics';
 import { Difficulty_Imgs, backgroundImage } from 'assets/imgs';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { RootState } from 'redux/store';
+import { getDifficultyImg } from 'utils/getImgByDifficulty';
 
 SplashScreen.preventAutoHideAsync();
 
 const ANIMATION_DURATION = 40000;
 const IMG_SIZE = scale(100);
 
+const PLAY_BUTTON_TEXT = 'Гуляць';
+const SELECT_DIFFICULTY_TEXT = 'Выбраць складанасць';
+const RULES_TEXT = 'Правілы гульні';
+const DIFFICULTY_ALERT_TITLE = 'Абярыце іншую складанасць!';
+const DIFFICULTY_ALERT_MESSAGE =
+  'Падаецца, Вы прайшлі ўсе ўзроўні на гэтай складанасці. Вы можаце выбраць іншую складанасць і працягнуць гуляць.';
+
 const Start = () => {
   const { width } = useWindowDimensions();
-  const { difficulty, isPlayable } = useDifficulty();
+  const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
+  const isPlayable = useSelector((state: RootState) => state.difficulty.isPlayable);
+
   const [fontsLoaded, fontError] = useFonts({
     'JetBrainsMono-Regular': require('assets/fonts/JetBrainsMono-Regular.ttf'),
     'JetBrainsMono-Bold': require('assets/fonts/JetBrainsMono-Bold.ttf'),
@@ -71,36 +82,17 @@ const Start = () => {
     }
   }, [fontsLoaded, fontError]);
 
-  const getDifficultyImg = (difficulty: number) => {
-    switch (difficulty) {
-      case 0:
-        return Difficulty_Imgs.difficulty_0;
-      case 1:
-        return Difficulty_Imgs.difficulty_1;
-      case 2:
-        return Difficulty_Imgs.difficulty_2;
-      case 3:
-        return Difficulty_Imgs.difficulty_3;
-      default:
-        return Difficulty_Imgs.difficulty_0;
-    }
-  };
-
   const handlePlayBtn = () => {
     if (!isPlayable) {
-      Alert.alert(
-        'Абярыце іншую складанасць!',
-        'Падаецца, Вы прайшлі ўсе ўзроўні на гэтай складанасці. Вы можаце выбраць іншую складанасць і працягнуць гуляць.',
-        [
-          {
-            text: 'Выбраць складанасць',
-            onPress: () => {
-              router.push('difficulty');
-            },
+      Alert.alert(DIFFICULTY_ALERT_TITLE, DIFFICULTY_ALERT_MESSAGE, [
+        {
+          text: 'Выбраць складанасць',
+          onPress: () => {
+            router.push('difficulty');
           },
-          { text: 'Ok', onPress: () => {} },
-        ],
-      );
+        },
+        { text: 'Ok', onPress: () => {} },
+      ]);
     }
   };
 
@@ -117,13 +109,13 @@ const Start = () => {
           source={getDifficultyImg(difficulty)}
         />
         <Link style={styles.playBtn} onPress={handlePlayBtn} href={!isPlayable ? '' : '/game'}>
-          Гуляць
+          {PLAY_BUTTON_TEXT}
         </Link>
         <Link style={styles.txt} href={'/difficulty'}>
-          Выбраць складанасць
+          {SELECT_DIFFICULTY_TEXT}
         </Link>
         <Link style={styles.txt} href={'/rules'}>
-          Правілы гульні
+          {RULES_TEXT}
         </Link>
       </ImageBackground>
     </View>

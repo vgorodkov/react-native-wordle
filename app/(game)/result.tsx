@@ -1,10 +1,9 @@
 import { Alert, ImageBackground, Pressable, StyleSheet, Text, View, Image } from 'react-native';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect } from 'react';
 import * as Linking from 'expo-linking';
 import { router, useLocalSearchParams } from 'expo-router';
-import { getStoredStr, removeValue, storeStr } from 'utils/asyncStorage';
-import { EASY_NOUNS, useDifficulty } from 'components/DifficultyProvider';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { removeValue } from 'utils/asyncStorage';
+
 import LottieView from 'lottie-react-native';
 import { StatusBar } from 'expo-status-bar';
 import { Progressbar } from 'components/Progressbar';
@@ -12,30 +11,48 @@ import { useSharedValue, withSpring } from 'react-native-reanimated';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { scale } from 'utils/metrics';
 import { Result_Imgs, backgroundImage } from 'assets/imgs';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState } from 'redux/store';
+import {
+  addToUnguessedWords,
+  increaseCurrentWordIndex,
+  increaseProgress,
+  removeFromUnguessedWords,
+  setIsPlayable,
+} from 'redux/slices/difficultySlice';
+import { resetGame } from 'redux/slices/gameSlice';
 
 const Result = () => {
-  const { target, isWordGuessed } = useLocalSearchParams();
+  const { targetWord, isWordGuessed } = useLocalSearchParams();
+  const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
 
-  const { difficulty, setProgress, progress, isPlayable } = useDifficulty();
-  const totalLength = EASY_NOUNS.length;
+  const progress = useSelector(
+    (state: RootState) => state.difficulty.difficulties[difficulty].currentProgress,
+  );
+  const dispatch = useDispatch();
+
+  const isPlayable = useSelector((state: RootState) => state.difficulty.isPlayable);
+  const inUnguessed = useSelector((state: RootState) => state.difficulty.isUnguessedWords);
+
+  const totalLength = 418;
   const progressbarValue = useSharedValue(0);
 
   useEffect(() => {
-    const storeProgress = () => {
-      setProgress(progress + 1);
-      AsyncStorage.setItem(`difficulty-${difficulty}-progress`, (progress + 1).toString());
-    };
-
-    removeValue('words');
-
-    //for some reason expo router casts params to string
-    if (isWordGuessed === 'true') {
-      storeProgress();
-    } else {
-      //return to incorrect words when others are guessed. Perhaps, store incorrect words in asyncStorage and if other words is completed pull from async
-      storeProgress();
-    }
     progressbarValue.value = withSpring((progress * 100) / totalLength, { duration: 300 });
+    //expo router casts boolean to string
+    if (isWordGuessed === 'true') {
+      dispatch(increaseProgress());
+      if (inUnguessed) {
+        dispatch(removeFromUnguessedWords(targetWord));
+      }
+    } else {
+      if (!inUnguessed) {
+        dispatch(addToUnguessedWords(targetWord));
+      }
+    }
+    dispatch(setIsPlayable());
+    dispatch(increaseCurrentWordIndex());
+    dispatch(resetGame());
   }, []);
 
   const handleExit = () => {
@@ -99,7 +116,7 @@ const Result = () => {
         </Text>
         <View style={styles.mainContent}>
           <Text style={styles.txt}>Правильное слово:</Text>
-          <Text style={[styles.txt, styles.targetWord]}> {target}</Text>
+          <Text style={[styles.txt, styles.targetWord]}> {targetWord}</Text>
         </View>
         <Progressbar
           progress={progressbarValue}
@@ -113,7 +130,7 @@ const Result = () => {
           style={({ pressed }) =>
             pressed ? [styles.btn, styles.txtBtn, { opacity: 0.7 }] : [styles.btn, styles.txtBtn]
           }
-          onPress={() => Linking.openURL(`https://ru.wiktionary.org/wiki/${target}`)}
+          onPress={() => Linking.openURL(`https://ru.wiktionary.org/wiki/${targetWord}`)}
         >
           <Ionicons name="book-outline" color={'#F6E7BE'} size={24} />
           <Text style={[styles.btnTxt, styles.txtBtnTxt]}>Значение слова</Text>
