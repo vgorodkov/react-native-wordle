@@ -1,10 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native';
-import React, { MutableRefObject, memo, useEffect } from 'react';
-import { useDifficulty } from 'components/DifficultyProvider';
+import React, { MutableRefObject, memo, useEffect, useState } from 'react';
+
 import { useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
 import InactiveLetter from './InactiveLetter';
 import { Letter } from './Letter';
 import { handleCorrectWord, handleIncorrectWord } from 'utils/handleWordAnimation';
+import { Difficulties, WORDS_BY_DIFFICULTY } from 'redux/slices/difficultySlice';
 
 interface WordRowProps {
   letters: string[];
@@ -17,14 +18,17 @@ interface WordRowProps {
 
 export const WordRow = memo(
   ({ letters, correctLetters, target, isActive, onWordLetter, activeCol }: WordRowProps) => {
-    const { allWords } = useDifficulty();
+    const allWords = WORDS_BY_DIFFICULTY[Difficulties.Universal];
     const colors = letters.map(() => useSharedValue('transparent'));
+
+    const isNotExistingWord = useSharedValue(false);
 
     useEffect(() => {
       if (letters.join('').length === 5 && allWords.includes(letters.join(''))) {
         handleCorrectWord(letters.join(''), target, colors);
       } else if (letters.join('').length === 5) {
         handleIncorrectWord(colors, letters.join(''));
+        isNotExistingWord.value = true;
       }
     }, [letters]);
 
@@ -56,6 +60,7 @@ export const WordRow = memo(
                 letter={item}
                 key={index}
                 color={colors[index]}
+                isNotExistingWord={isNotExistingWord}
               />
             );
           }
