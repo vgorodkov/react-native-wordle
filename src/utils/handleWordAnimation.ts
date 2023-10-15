@@ -1,4 +1,4 @@
-import { Theme } from 'assets/theme';
+import { Theme } from 'constants/theme';
 import { SharedValue, withSequence, withTiming } from 'react-native-reanimated';
 const ANIMATION_DURATION = 300;
 

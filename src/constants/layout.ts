@@ -1,9 +1,11 @@
 import { moderateScale, scale, verticalScale } from 'utils/metrics';
 
 export const Layout = {
-  largePadding: scale(48),
-  mediumPadding: scale(24),
-  smallPadding: scale(16),
-  extraSmallPadding: scale(8),
-  wordBox: verticalScale(58),
+  largeSpacing: 48,
+  mediumSpacing: 24,
+  defaultSpacing: 16,
+  smallSpacing: 8,
+  keyboardLetterSpacing: 10,
+  wordBox: 64,
+  defaultIconSize: 32,
 };

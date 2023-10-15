@@ -1,4 +1,4 @@
-import { Theme } from 'assets/theme';
+import { Theme } from 'constants/theme';
 import { SharedValue } from 'react-native-reanimated';
 
 //expected 2d array of colors. colors[rowIndex][letterIndexInRow]

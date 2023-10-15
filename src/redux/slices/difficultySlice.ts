@@ -1,5 +1,6 @@
 import { createAction, createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
+
 import { getRandomWord } from 'utils/getRandomWord';
 
 export enum Difficulties {
@@ -9,16 +10,16 @@ export enum Difficulties {
   Universal,
 }
 
+type Difficulty = {
+  currentWordIndex: number;
+  currentProgress: number;
+};
+
 export const WORDS_BY_DIFFICULTY = {
   [Difficulties.Easy]: require('data/be-5-easy-nouns.json'),
   [Difficulties.Medium]: require('data/be-5-medium-nouns.json'),
   [Difficulties.Hard]: require('data/be-5-hard-nouns.json'),
   [Difficulties.Universal]: require('data/be-5.json'),
-};
-
-type Difficulty = {
-  currentWordIndex: number;
-  currentProgress: number;
 };
 
 export interface DifficultyState {
