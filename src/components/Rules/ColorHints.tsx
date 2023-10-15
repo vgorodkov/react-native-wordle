@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
+import { moderateScale } from 'utils/metrics';
 
 export const ColorHint = ({ hintText, bgColor }: { hintText: string; bgColor: string }) => {
   return (
@@ -23,7 +24,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   colorHintTxt: {
-    fontSize: 12,
+    fontSize: moderateScale(10, 1),
     color: 'white',
     fontWeight: '500',
     fontFamily: 'JetBrainsMono-Bold',

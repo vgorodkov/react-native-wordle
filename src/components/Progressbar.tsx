@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, Dimensions } from 'react-native';
 import React, { useEffect } from 'react';
 import Animated, {
   Easing,
@@ -7,6 +7,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import { Theme } from 'constants/theme';
 
 interface ProgressbarProps {
   progress?: SharedValue<number>;
@@ -15,7 +16,12 @@ interface ProgressbarProps {
   total: string | number;
 }
 
-export const Progressbar = ({ color = '#B32926', current, total }: ProgressbarProps) => {
+const { width, height } = Dimensions.get('window');
+const ANIMATION_DURATION = 500;
+const PROGRESS_BAR_HEIGHT = width > 600 ? 24 : 16;
+const PROGRESS_BAR_FONT_SIZE = width > 600 ? 16 : 12;
+
+export const Progressbar = ({ color = Theme.colors.primary, current, total }: ProgressbarProps) => {
   const progress = useSharedValue(0);
   const progressBarAnimatedStyle = useAnimatedStyle(() => {
     return {
@@ -25,13 +31,13 @@ export const Progressbar = ({ color = '#B32926', current, total }: ProgressbarPr
 
   useEffect(() => {
     progress.value = withTiming((+current * 100) / +total, {
-      duration: 500,
+      duration: ANIMATION_DURATION,
       easing: Easing.out(Easing.cubic),
     });
   }, [current]);
 
   return (
-    <View>
+    <View style={{ justifyContent: 'center' }}>
       <View style={[styles.progressbar, styles.backgroundProgressbar]} />
       <Animated.View
         style={[styles.progressbar, { backgroundColor: color }, progressBarAnimatedStyle]}
@@ -45,7 +51,7 @@ export const Progressbar = ({ color = '#B32926', current, total }: ProgressbarPr
 
 const styles = StyleSheet.create({
   progressbar: {
-    height: 16,
+    height: PROGRESS_BAR_HEIGHT,
     borderRadius: 4,
   },
   backgroundProgressbar: {
@@ -57,7 +63,7 @@ const styles = StyleSheet.create({
   progressbarLabel: {
     position: 'absolute',
     alignSelf: 'center',
-    fontSize: 12,
+    fontSize: PROGRESS_BAR_FONT_SIZE,
     color: 'black',
     fontFamily: 'JetBrainsMono-Bold',
   },

@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, Text } from 'react-native';
 import React, { memo } from 'react';
 import { selectCurrentCol } from 'redux/slices/gameSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,7 +15,7 @@ import Animated, {
 } from 'react-native-reanimated';
 import { RootState } from 'redux/store';
 import { moderateScale } from 'utils/metrics';
-import { Theme } from 'assets/theme';
+import { Theme } from 'constants/theme';
 
 const handleLetterColor = (letter: string, target: string, letterIndex: number) => {
   if (letter !== '') {
@@ -41,8 +41,11 @@ interface LetterProps {
   isNotExistingWord: SharedValue<boolean>;
 }
 
+const { width } = Dimensions.get('window');
+
 const OFFSET = 5;
 const TIME = 300;
+const FONT_SIZE = width > 600 ? 28 : 24;
 
 export const Letter = memo(
   ({
@@ -58,13 +61,16 @@ export const Letter = memo(
     const correctLetter = useSelector((state: RootState) => state.game.correctLetters[letterIndex]);
 
     const dispatch = useDispatch();
-    const borderColor = isActive ? Theme.colors.primary : 'white';
-    const borderWidth = isActive ? 3 : 1;
+
     const color = useSharedValue(Theme.colors.initialLetter);
     const scale = useSharedValue(1);
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
     const rotationY = useSharedValue(180);
+
+    const borderColor = isActive ? Theme.colors.primary : 'white';
+    const borderWidth = isActive ? 3 : 1;
+    const result = handleLetterColor(letter, target, letterIndex);
 
     const letterStyle = useAnimatedStyle(() => {
       return {
@@ -83,8 +89,6 @@ export const Letter = memo(
         transform: [{ rotateY: `${rotationY.value}deg` }],
       };
     });
-
-    const result = handleLetterColor(letter, target, letterIndex);
 
     useAnimatedReaction(
       () => shouldCheck,
@@ -147,7 +151,7 @@ export const Letter = memo(
     };
 
     return (
-      <Pressable onPress={handleWordLetter}>
+      <Pressable onPress={isRowActive ? handleWordLetter : () => {}}>
         <Animated.View style={[styles.wordBox, { borderColor, borderWidth }, letterStyle]}>
           {letter === '' && correctLetter !== '' && isRowActive ? (
             <Text style={[styles.letter, styles.inactiveLetter]}>
@@ -170,14 +174,12 @@ const styles = StyleSheet.create({
   wordBox: {
     width: Layout.wordBox,
     height: Layout.wordBox,
-    borderWidth: 1,
     borderColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 0,
   },
   letter: {
-    fontSize: moderateScale(20, 2),
+    fontSize: FONT_SIZE,
     color: 'white',
     fontWeight: '600',
     fontFamily: 'JetBrainsMono-Bold',

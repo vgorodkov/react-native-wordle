@@ -1,14 +1,16 @@
 import { StyleSheet, ImageBackground, ActivityIndicator } from 'react-native';
 import React from 'react';
+import { backgroundImage } from 'assets/imgs';
+import { Theme } from 'constants/theme';
 
 export const Loading = () => {
   return (
     <ImageBackground
       imageStyle={{ flex: 1 }}
-      source={require('assets/imgs/background-stars.png')}
+      source={backgroundImage}
       style={styles.loadingContainer}
     >
-      <ActivityIndicator color={'#F6E7BE'} size={'large'} />
+      <ActivityIndicator color={Theme.colors.primary} size={'large'} />
     </ImageBackground>
   );
 };

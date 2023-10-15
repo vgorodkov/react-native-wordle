@@ -1,7 +1,7 @@
-import { StyleSheet, Text, View } from 'react-native';
-import React, { MutableRefObject, memo, useEffect, useState } from 'react';
+import { StyleSheet, View } from 'react-native';
+import React, { memo, useEffect } from 'react';
 
-import { useSharedValue, withSequence, withTiming } from 'react-native-reanimated';
+import { useSharedValue } from 'react-native-reanimated';
 import InactiveLetter from './InactiveLetter';
 import { Letter } from './Letter';
 import { handleCorrectWord, handleIncorrectWord } from 'utils/handleWordAnimation';
@@ -23,11 +23,13 @@ export const WordRow = memo(
 
     const isNotExistingWord = useSharedValue(false);
 
+    const word = letters.join('');
+
     useEffect(() => {
-      if (letters.join('').length === 5 && allWords.includes(letters.join(''))) {
-        handleCorrectWord(letters.join(''), target, colors);
-      } else if (letters.join('').length === 5) {
-        handleIncorrectWord(colors, letters.join(''));
+      if (word.length === 5 && allWords.includes(word)) {
+        handleCorrectWord(word, target, colors);
+      } else if (word.length === 5) {
+        handleIncorrectWord(colors, word);
         isNotExistingWord.value = true;
       }
     }, [letters]);
