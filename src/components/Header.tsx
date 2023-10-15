@@ -1,35 +1,28 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
 import React, { memo } from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { router } from 'expo-router';
-import { useDifficulty } from './DifficultyProvider';
+
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
+import { DIFFICULTIES } from 'constants/difficulties';
+import { Layout } from 'constants/layout';
 
 interface HeaderProps {
   handleHint: () => void;
 }
+
+const { width } = Dimensions.get('window');
+
+const TITLE_SIZE = width > 600 ? 28 : 20;
+const SUBTITLE_SIZE = width > 600 ? 24 : 16;
+const HEADER_WIDTH = width > 600 ? '50%' : '100%';
 
 export const Header = memo(({ handleHint }: HeaderProps) => {
   const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
   const progress = useSelector(
     (state: RootState) => state.difficulty.difficulties[difficulty].currentProgress,
   );
-  const handleDifficultyName = () => {
-    switch (difficulty) {
-      case 0:
-        return 'Лёгкая';
-      case 1:
-        return 'Сярэдняя';
-      case 2:
-        return 'Складаная';
-      case 3:
-        return 'Універсальная';
-
-      default:
-        return 'Невядомая';
-    }
-  };
 
   const handleExitBtn = () => {
     router.back();
@@ -39,7 +32,7 @@ export const Header = memo(({ handleHint }: HeaderProps) => {
     <View style={styles.header}>
       <Ionicons onPress={handleExitBtn} name="arrow-back-outline" size={32} color="white" />
       <View style={{ alignItems: 'center' }}>
-        <Text style={styles.txt}>{handleDifficultyName()}</Text>
+        <Text style={styles.txt}>{DIFFICULTIES[difficulty].name}</Text>
         <Text style={styles.subTxt}>Уровень: {progress}</Text>
       </View>
       <TouchableOpacity onPress={handleHint}>
@@ -54,23 +47,26 @@ export const Header = memo(({ handleHint }: HeaderProps) => {
 
 const styles = StyleSheet.create({
   header: {
-    width: '100%',
-    marginHorizontal: 16,
+    width: HEADER_WIDTH,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 8,
+    paddingBottom: Layout.smallSpacing,
     flexDirection: 'row',
-    paddingHorizontal: 24,
+    paddingHorizontal: Layout.mediumSpacing,
   },
   txt: {
-    fontSize: 24,
+    fontSize: TITLE_SIZE,
     color: 'white',
     fontFamily: 'JetBrainsMono-Bold',
   },
   subTxt: {
-    fontSize: 16,
+    fontSize: SUBTITLE_SIZE,
     color: 'white',
-
     fontFamily: 'JetBrainsMono-Medium',
+  },
+  hintIcon: {
+    resizeMode: 'contain',
+    width: Layout.defaultIconSize,
+    height: Layout.defaultIconSize,
   },
 });

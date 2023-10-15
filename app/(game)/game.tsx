@@ -1,7 +1,6 @@
-import { Alert, ImageBackground, StyleSheet, View } from 'react-native';
+import { Alert, Dimensions, ImageBackground, StyleSheet, View, Platform } from 'react-native';
 import React, { useEffect, useMemo, useRef } from 'react';
 
-import AnotherKeyboard from 'components/AnotherKeyboard';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
 
@@ -15,9 +14,11 @@ import {
   setCorrectLetters,
   setHintWasUsed,
 } from 'redux/slices/gameSlice';
-import { useSharedValue } from 'react-native-reanimated';
 import { Difficulties, WORDS_BY_DIFFICULTY } from 'redux/slices/difficultySlice';
-import { handleWordCheck } from 'utils/handleWordCheck';
+import CustomKeyboard from 'components/CustomKeyboard/Keyboard';
+import { ROUTES } from 'constants/routes';
+import { GameScreenString } from 'constants/strings';
+import { Layout } from 'constants/layout';
 
 const getCorrectLetters = (target: string, word: string) => {
   const correctLetters = ['', '', '', '', ''];
@@ -28,6 +29,8 @@ const getCorrectLetters = (target: string, word: string) => {
   }
   return correctLetters;
 };
+
+const { width, height } = Dimensions.get('window');
 
 const NUM_ROWS = 6;
 const NUM_COLS = 5;
@@ -53,8 +56,9 @@ const Game = () => {
 
   const wordsRef = useRef(words);
   console.log(targetWord);
+
   const handleGameEnd = (isGuessed: boolean) => {
-    router.replace({ pathname: '/result', params: { targetWord, isWordGuessed: isGuessed } });
+    router.replace({ pathname: ROUTES.RESULT, params: { targetWord, isWordGuessed: isGuessed } });
     dispatch(resetGame());
   };
 
@@ -66,7 +70,7 @@ const Game = () => {
       dispatch(setCorrectLetters(updatedCorrectLetters));
       dispatch(setHintWasUsed());
     } else {
-      Alert.alert('Пачакайце...', 'Вы ўжо выкарыстоўвалі падказку!');
+      Alert.alert(GameScreenString.HINT_ALERT_TITLE, GameScreenString.HINT_ALERT_TEXT);
     }
   };
 
@@ -90,7 +94,7 @@ const Game = () => {
   }, [word]);
 
   return (
-    <ImageBackground source={backgroundImage} style={styles.container}>
+    <ImageBackground source={backgroundImage} style={[styles.container, { width, height }]}>
       <Header handleHint={handleHint} />
       <View>
         {INITIAL_EMPTY_WORDS.map((item, index) => (
@@ -104,7 +108,7 @@ const Game = () => {
           />
         ))}
       </View>
-      <AnotherKeyboard target={targetWord} wordsRef={wordsRef} />
+      <CustomKeyboard target={targetWord} wordsRef={wordsRef} />
     </ImageBackground>
   );
 };

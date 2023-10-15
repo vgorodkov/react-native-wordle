@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View, Image } from 'react-native';
 import React, { memo } from 'react';
 
-import { Theme } from 'assets/theme';
 import { Layout } from 'constants/layout';
 import { scale } from 'utils/metrics';
+import { Theme } from 'constants/theme';
 
 export interface Difficultyitem {
   img: number;
@@ -63,19 +63,18 @@ const styles = StyleSheet.create({
   difficultyItemContainer: {
     flex: 1,
     alignSelf: 'center',
-    paddingHorizontal: Layout.mediumPadding,
+    paddingHorizontal: Layout.mediumSpacing,
     justifyContent: 'space-between',
-    paddingBottom: Layout.smallPadding,
-
+    paddingBottom: Layout.smallSpacing,
     width: '80%',
   },
   difficultyItemContent: {
-    gap: Layout.mediumPadding,
+    gap: Layout.mediumSpacing,
     alignItems: 'center',
   },
   img: {
     height: IMG_SIZE,
-    marginTop: Layout.mediumPadding,
+    marginTop: Layout.mediumSpacing,
     resizeMode: 'contain',
   },
 });

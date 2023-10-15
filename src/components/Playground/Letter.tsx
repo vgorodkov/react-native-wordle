@@ -12,6 +12,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+import { Theme } from 'constants/theme';
 
 interface LetterProps {
   letter: string;
@@ -69,14 +70,14 @@ export const Letter = memo(
         }
       },
     );
-
+    console.log(isActiveRow);
     return (
       <Pressable onPress={() => (isActiveRow ? onWordLetter(letterIndex) : {})}>
         <Animated.View
           style={[
             styles.wordBox,
             aStyle,
-            isActiveCol && { borderWidth: 3, borderColor: '#F6E7BE' },
+            isActiveCol && { borderWidth: 3, borderColor: Theme.colors.primary },
           ]}
         >
           <Text style={styles.letter}>{letter.toUpperCase()}</Text>

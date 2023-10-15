@@ -1,8 +1,11 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import { Theme } from 'assets/theme';
+
 import { ColorHint } from './ColorHints';
 import { ExampleLetter } from './ExampleLetter';
+import { Theme } from 'constants/theme';
+import { RulesScreenString } from 'constants/strings';
+import { moderateScale, scale } from 'utils/metrics';
 
 const EXAMPLE = [
   { letter: 'К', bgColor: Theme.colors.notInWordLetter },
@@ -12,9 +15,9 @@ const EXAMPLE = [
   { letter: 'Н', bgColor: Theme.colors.notInWordLetter },
 ];
 const COLORS_HINTS = [
-  { color: Theme.colors.correctLetter, hintText: '- літара ёсць і яна стаіць на месцы.' },
-  { color: Theme.colors.inWordLetter, hintText: '- літара ёсць у загаданым слове.' },
-  { color: Theme.colors.notInWordLetter, hintText: '- літары ў слове няма.' },
+  { color: Theme.colors.correctLetter, hintText: RulesScreenString.FIRST_HINT },
+  { color: Theme.colors.inWordLetter, hintText: RulesScreenString.SECOND_HINT },
+  { color: Theme.colors.notInWordLetter, hintText: RulesScreenString.THIRD_HINT },
 ];
 
 export const Example = ({ rule, index }: { rule: string; index: number }) => {
@@ -43,7 +46,7 @@ const styles = StyleSheet.create({
   },
   ruleTxt: {
     textAlign: 'left',
-    fontSize: 16,
+    fontSize: moderateScale(14, 1),
     color: 'white',
     fontWeight: '500',
     fontFamily: 'JetBrainsMono-Regular',
@@ -54,14 +57,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     gap: 8,
   },
-  exampleLetter: {
-    width: 56,
-    height: 56,
-    borderWidth: 1,
-    borderColor: 'white',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
+
   colorHintsContainer: {
     alignSelf: 'flex-end',
     gap: 8,

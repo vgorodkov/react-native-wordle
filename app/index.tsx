@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { View, ImageBackground, useWindowDimensions, Alert, StyleSheet } from 'react-native';
+import { View, ImageBackground, Alert, StyleSheet, Dimensions } from 'react-native';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -14,25 +14,24 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
 import { getStoredStr } from 'utils/asyncStorage';
-import { scale } from 'utils/metrics';
-import { Difficulty_Imgs, backgroundImage } from 'assets/imgs';
+import { backgroundImage } from 'assets/imgs';
 import { RootState } from 'redux/store';
-import { getDifficultyImg } from 'utils/getImgByDifficulty';
+
+import { ROUTES } from 'constants/routes';
+import { StartScreenString } from 'constants/strings';
+import { DIFFICULTIES } from 'constants/difficulties';
 
 SplashScreen.preventAutoHideAsync();
 
-const ANIMATION_DURATION = 40000;
-const IMG_SIZE = scale(100);
+const { width, height } = Dimensions.get('window');
 
-const PLAY_BUTTON_TEXT = 'Гуляць';
-const SELECT_DIFFICULTY_TEXT = 'Выбраць складанасць';
-const RULES_TEXT = 'Правілы гульні';
-const DIFFICULTY_ALERT_TITLE = 'Абярыце іншую складанасць!';
-const DIFFICULTY_ALERT_MESSAGE =
-  'Падаецца, Вы прайшлі ўсе ўзроўні на гэтай складанасці. Вы можаце выбраць іншую складанасць і працягнуць гуляць.';
+const ANIMATION_DURATION = width > 600 ? 65000 : 40000;
+const IMG_SIZE = width > 600 ? 200 : 100;
+const OFFSET_Y = 80;
+const PLAY_BTN_FONT_SIZE = width > 600 ? 32 : 24;
+const OTHER_BTN_FONT_SIZE = width > 600 ? 28 : 20;
 
 const Start = () => {
-  const { width } = useWindowDimensions();
   const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
   const isPlayable = useSelector((state: RootState) => state.difficulty.isPlayable);
 
@@ -62,15 +61,15 @@ const Start = () => {
       );
       translateY.value = withRepeat(
         withSequence(
-          withTiming(-80, { duration: ANIMATION_DURATION }),
-          withTiming(20, { duration: ANIMATION_DURATION }),
+          withTiming(-OFFSET_Y, { duration: ANIMATION_DURATION }),
+          withTiming(OFFSET_Y, { duration: ANIMATION_DURATION }),
           withTiming(0, { duration: ANIMATION_DURATION }),
         ),
         -1,
       );
       getStoredStr('rules-opened').then((data) => {
         if (!data) {
-          router.push('rules');
+          router.push(ROUTES.RULES);
         }
       });
     }
@@ -84,15 +83,19 @@ const Start = () => {
 
   const handlePlayBtn = () => {
     if (!isPlayable) {
-      Alert.alert(DIFFICULTY_ALERT_TITLE, DIFFICULTY_ALERT_MESSAGE, [
-        {
-          text: 'Выбраць складанасць',
-          onPress: () => {
-            router.push('difficulty');
+      Alert.alert(
+        StartScreenString.DIFFICULTY_ALERT_TITLE,
+        StartScreenString.DIFFICULTY_ALERT_MESSAGE,
+        [
+          {
+            text: StartScreenString.DIFFICULTY_BTN_TEXT,
+            onPress: () => {
+              router.push(ROUTES.DIFFICULTY);
+            },
           },
-        },
-        { text: 'Ok', onPress: () => {} },
-      ]);
+          { text: 'Ok', onPress: () => {} },
+        ],
+      );
     }
   };
 
@@ -103,19 +106,23 @@ const Start = () => {
   return (
     <View style={styles.container} onLayout={onLayoutRootView}>
       <StatusBar hidden />
-      <ImageBackground resizeMode="cover" style={styles.bgImg} source={backgroundImage}>
+      <ImageBackground
+        resizeMode="cover"
+        style={[styles.bgImg, { width, height }]}
+        source={backgroundImage}
+      >
         <Animated.Image
           style={[styles.difficultyImg, animatedImage]}
-          source={getDifficultyImg(difficulty)}
+          source={DIFFICULTIES[difficulty].img}
         />
-        <Link style={styles.playBtn} onPress={handlePlayBtn} href={!isPlayable ? '' : '/game'}>
-          {PLAY_BUTTON_TEXT}
+        <Link style={styles.playBtn} onPress={handlePlayBtn} href={!isPlayable ? '' : ROUTES.GAME}>
+          {StartScreenString.PLAY_BTN_TEXT}
         </Link>
-        <Link style={styles.txt} href={'/difficulty'}>
-          {SELECT_DIFFICULTY_TEXT}
+        <Link style={styles.txt} href={ROUTES.DIFFICULTY}>
+          {StartScreenString.DIFFICULTY_BTN_TEXT}
         </Link>
-        <Link style={styles.txt} href={'/rules'}>
-          {RULES_TEXT}
+        <Link style={styles.txt} href={ROUTES.RULES}>
+          {StartScreenString.RULES_BTN_TEXT}
         </Link>
       </ImageBackground>
     </View>
@@ -127,7 +134,7 @@ export default Start;
 const styles = StyleSheet.create({
   container: { flex: 1 },
   playBtn: {
-    fontSize: 24,
+    fontSize: PLAY_BTN_FONT_SIZE,
     color: 'white',
     fontFamily: 'JetBrainsMono-Bold',
     borderBottomWidth: 4,
@@ -140,7 +147,7 @@ const styles = StyleSheet.create({
     gap: 12,
   },
   txt: {
-    fontSize: 20,
+    fontSize: OTHER_BTN_FONT_SIZE,
     color: 'lightgray',
     fontFamily: 'JetBrainsMono-Bold',
   },
