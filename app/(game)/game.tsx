@@ -1,24 +1,21 @@
-import { Alert, Dimensions, ImageBackground, StyleSheet, View, Platform } from 'react-native';
-import React, { useEffect, useMemo, useRef } from 'react';
+import { ImageBackground, StyleSheet, View, InteractionManager } from 'react-native';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
+import { moveToNextRow, resetGame, setCorrectLetters } from 'redux/slices/gameSlice';
+import { Difficulties, WORDS_BY_DIFFICULTY } from 'redux/slices/difficultySlice';
 
+import { router } from 'expo-router';
+import { ROUTES } from 'constants/routes';
+
+import CustomKeyboard from 'components/CustomKeyboard/Keyboard';
 import { backgroundImage } from 'assets/imgs';
 import { Header } from 'components/Header';
-import { Row } from 'components/Game/WordRow';
-import { router } from 'expo-router';
-import {
-  moveToNextRow,
-  resetGame,
-  setCorrectLetters,
-  setHintWasUsed,
-} from 'redux/slices/gameSlice';
-import { Difficulties, WORDS_BY_DIFFICULTY } from 'redux/slices/difficultySlice';
-import CustomKeyboard from 'components/CustomKeyboard/Keyboard';
-import { ROUTES } from 'constants/routes';
-import { GameScreenString } from 'constants/strings';
-import { Layout } from 'constants/layout';
+
+import { UNIVERSAL_STYLES } from 'constants/universalStyles';
+import { Loading } from 'components/Loading';
+import { Gameboard } from 'components/Game/Gameboard';
 
 const getCorrectLetters = (target: string, word: string) => {
   const correctLetters = ['', '', '', '', ''];
@@ -30,85 +27,60 @@ const getCorrectLetters = (target: string, word: string) => {
   return correctLetters;
 };
 
-const { width, height } = Dimensions.get('window');
-
-const NUM_ROWS = 6;
 const NUM_COLS = 5;
 
 const Game = () => {
-  const INITIAL_EMPTY_WORDS = useMemo(
-    () => Array.from({ length: NUM_ROWS }, () => Array.from({ length: NUM_COLS }, () => '')),
-    [],
-  );
+  const [isLoading, setIsLoading] = useState(true);
 
-  const dispatch = useDispatch();
-
-  const currentRow = useSelector((state: RootState) => state.game.currentRow);
-  const currentCol = useSelector((state: RootState) => state.game.currentCol);
-  const targetWord = useSelector((state: RootState) => state.difficulty.currentWord);
+  const target = useSelector((state: RootState) => state.difficulty.currentWord);
   const isGameEnded = useSelector((state: RootState) => state.game.isGameEnded);
   const words = useSelector((state: RootState) => state.game.words);
   const word = useSelector((state: RootState) => state.game.currentWord);
-  const correctLetters = useSelector((state: RootState) => state.game.correctLetters);
-  const hintWasUsed = useSelector((state: RootState) => state.game.hintWasUsed);
-
-  const isWordGuessed = word === targetWord;
 
   const wordsRef = useRef(words);
-  console.log(targetWord);
+
+  const dispatch = useDispatch();
+
+  const isWordGuessed = word === target;
 
   const handleGameEnd = (isGuessed: boolean) => {
-    router.replace({ pathname: ROUTES.RESULT, params: { targetWord, isWordGuessed: isGuessed } });
+    router.replace({ pathname: ROUTES.result, params: { target, isWordGuessed: isGuessed } });
     dispatch(resetGame());
   };
 
-  const handleHint = () => {
-    if (!hintWasUsed) {
-      const updatedCorrectLetters = [...correctLetters];
-      const letterToShow = targetWord[currentCol];
-      updatedCorrectLetters[currentCol] = letterToShow;
-      dispatch(setCorrectLetters(updatedCorrectLetters));
-      dispatch(setHintWasUsed());
-    } else {
-      Alert.alert(GameScreenString.HINT_ALERT_TITLE, GameScreenString.HINT_ALERT_TEXT);
-    }
-  };
-
   if (isGameEnded) {
-    setTimeout(() => handleGameEnd(false), 300 * NUM_COLS);
+    setTimeout(() => handleGameEnd(isWordGuessed), 300 * NUM_COLS);
   }
 
   if (isWordGuessed) {
-    setTimeout(() => handleGameEnd(true), 300 * NUM_COLS);
+    setTimeout(() => handleGameEnd(isWordGuessed), 300 * NUM_COLS);
   }
 
   useEffect(() => {
     if (word.length === 5) {
       if (WORDS_BY_DIFFICULTY[Difficulties.Universal].includes(word)) {
-        const correctLetters = getCorrectLetters(targetWord, word);
+        const correctLetters = getCorrectLetters(target, word);
         dispatch(setCorrectLetters(correctLetters));
         dispatch(moveToNextRow());
-      } else {
       }
     }
   }, [word]);
 
+  useEffect(() => {
+    InteractionManager.runAfterInteractions(() => setIsLoading(false));
+  }, []);
+
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
-    <ImageBackground source={backgroundImage} style={[styles.container, { width, height }]}>
-      <Header handleHint={handleHint} />
-      <View>
-        {INITIAL_EMPTY_WORDS.map((item, index) => (
-          <Row
-            target={targetWord}
-            currentCol={currentRow === index ? currentCol : -1}
-            isActive={currentRow === index}
-            key={index}
-            letters={item}
-            rowIndex={index}
-          />
-        ))}
+    <ImageBackground source={backgroundImage} style={(UNIVERSAL_STYLES.fullscreen, { flex: 1 })}>
+      <View style={styles.container}>
+        <Header target={target} />
+        <Gameboard target={target} />
+        <CustomKeyboard target={target} wordsRef={wordsRef} />
       </View>
-      <CustomKeyboard target={targetWord} wordsRef={wordsRef} />
     </ImageBackground>
   );
 };
@@ -118,8 +90,6 @@ export default Game;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 16,
   },
 });

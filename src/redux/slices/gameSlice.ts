@@ -61,7 +61,10 @@ export const gameSlice = createSlice({
       }
     },
     selectCurrentCol: (state, action) => {
-      state.currentCol = action.payload;
+      const { currentCol, currentRow } = action.payload;
+      if (currentRow === state.currentRow) {
+        state.currentCol = currentCol;
+      }
     },
     deleteLetter: (state) => {
       //remove letter
@@ -97,7 +100,12 @@ export const gameSlice = createSlice({
       state.hintWasUsed = false;
     },
     setCorrectLetters: (state, action) => {
-      state.correctLetters = action.payload;
+      for (let i = 0; i < state.correctLetters.length; i++) {
+        if (state.correctLetters[i] === '') {
+          state.correctLetters[i] = action.payload[i];
+          8;
+        }
+      }
     },
     setHintWasUsed: (state) => {
       state.hintWasUsed = true;

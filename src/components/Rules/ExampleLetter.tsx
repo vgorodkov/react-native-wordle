@@ -1,6 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import React from 'react';
 import { moderateScale, scale } from 'utils/metrics';
+import { LAYOUT } from 'constants/layout';
+import { FONT_SIZES, FONTS } from 'constants/fonts';
 
 export const ExampleLetter = ({ letter, bgColor }: { letter: string; bgColor: string }) => {
   return (
@@ -12,17 +14,16 @@ export const ExampleLetter = ({ letter, bgColor }: { letter: string; bgColor: st
 
 const styles = StyleSheet.create({
   exampleLetter: {
-    width: scale(48),
-    height: scale(48),
+    width: LAYOUT.wordBox * 0.9,
+    aspectRatio: 1,
     borderWidth: 1,
     borderColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
   },
   exampleLetterTxt: {
-    fontSize: moderateScale(16, 1),
+    fontSize: FONT_SIZES.smallScreen.headingMedium,
     color: 'white',
-    fontWeight: '600',
-    fontFamily: 'JetBrainsMono-Bold',
+    fontFamily: FONTS.bold,
   },
 });

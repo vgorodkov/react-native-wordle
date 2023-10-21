@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "beWordle",
+    "name": "Слоўцы",
     "slug": "wordle",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -30,7 +30,7 @@
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#1A1A1A"
+        "backgroundColor": "#1F1F1F"
       },
       "package": "com.tragediabelok.wordle"
     },

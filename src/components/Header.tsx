@@ -1,72 +1,92 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions } from 'react-native';
-import React, { memo } from 'react';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions, Alert } from 'react-native';
+import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { router } from 'expo-router';
+import { Link, router } from 'expo-router';
 
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
 import { DIFFICULTIES } from 'constants/difficulties';
-import { Layout } from 'constants/layout';
+import { LAYOUT } from 'constants/layout';
+import { setCorrectLetters, setHintWasUsed } from 'redux/slices/gameSlice';
+import { GAME_SCREEN_STRING } from 'constants/strings';
+import { Theme } from 'constants/theme';
 
 interface HeaderProps {
-  handleHint: () => void;
+  target: string;
 }
 
-const { width } = Dimensions.get('window');
-
-const TITLE_SIZE = width > 600 ? 28 : 20;
-const SUBTITLE_SIZE = width > 600 ? 24 : 16;
-const HEADER_WIDTH = width > 600 ? '50%' : '100%';
-
-export const Header = memo(({ handleHint }: HeaderProps) => {
+export const Header = ({ target }: HeaderProps) => {
   const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
   const progress = useSelector(
     (state: RootState) => state.difficulty.difficulties[difficulty].currentProgress,
   );
+  const hintWasUsed = useSelector((state: RootState) => state.game.hintWasUsed);
+  const currentCol = useSelector((state: RootState) => state.game.currentCol);
+  const correctLetters = useSelector((state: RootState) => state.game.correctLetters);
 
-  const handleExitBtn = () => {
-    router.back();
+  const dispatch = useDispatch();
+
+  const handleHint = () => {
+    if (!hintWasUsed) {
+      const updatedCorrectLetters = [...correctLetters];
+      const letterToShow = target[currentCol];
+      updatedCorrectLetters[currentCol] = letterToShow;
+      dispatch(setCorrectLetters(updatedCorrectLetters));
+      dispatch(setHintWasUsed());
+    } else {
+      Alert.alert(GAME_SCREEN_STRING.hintAlertTitle, GAME_SCREEN_STRING.hintAlertMessage);
+    }
   };
 
   return (
     <View style={styles.header}>
-      <Ionicons onPress={handleExitBtn} name="arrow-back-outline" size={32} color="white" />
+      <View style={styles.iconsContainer}>
+        <Link asChild href={'../'}>
+          <Ionicons name="arrow-back-outline" size={LAYOUT.defaultIconSize} color="white" />
+        </Link>
+        <View style={{ width: LAYOUT.defaultIconSize }} />
+      </View>
       <View style={{ alignItems: 'center' }}>
         <Text style={styles.txt}>{DIFFICULTIES[difficulty].name}</Text>
-        <Text style={styles.subTxt}>Уровень: {progress}</Text>
+        <Text style={styles.subTxt}>Узровень: {progress}</Text>
       </View>
-      <TouchableOpacity onPress={handleHint}>
-        <Image
-          source={require('assets/imgs/hint_bulb.png')}
-          style={{ width: 32, resizeMode: 'contain', height: 32 }}
-        />
-      </TouchableOpacity>
+      <View style={styles.iconsContainer}>
+        <Link asChild href={'rules'}>
+          <Ionicons name="help-circle-outline" color={Theme.colors.primary} size={32} />
+        </Link>
+        <TouchableOpacity onPress={handleHint}>
+          <Image source={require('assets/imgs/hint_bulb.png')} style={styles.hintIcon} />
+        </TouchableOpacity>
+      </View>
     </View>
   );
-});
+};
 
 const styles = StyleSheet.create({
   header: {
-    width: HEADER_WIDTH,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: Layout.smallSpacing,
+    paddingTop: LAYOUT.defaultSpacing,
     flexDirection: 'row',
-    paddingHorizontal: Layout.mediumSpacing,
+    paddingHorizontal: LAYOUT.mediumSpacing,
   },
   txt: {
-    fontSize: TITLE_SIZE,
+    fontSize: 20,
     color: 'white',
     fontFamily: 'JetBrainsMono-Bold',
   },
   subTxt: {
-    fontSize: SUBTITLE_SIZE,
+    fontSize: 16,
     color: 'white',
     fontFamily: 'JetBrainsMono-Medium',
   },
+  iconsContainer: {
+    flexDirection: 'row',
+    gap: 16,
+  },
   hintIcon: {
+    width: LAYOUT.defaultIconSize,
     resizeMode: 'contain',
-    width: Layout.defaultIconSize,
-    height: Layout.defaultIconSize,
+    height: LAYOUT.defaultIconSize,
   },
 });

@@ -1,23 +1,12 @@
-import {
-  Alert,
-  ImageBackground,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  Image,
-  Dimensions,
-} from 'react-native';
+import { ImageBackground, StyleSheet, Text, View, Image } from 'react-native';
 import React, { useEffect } from 'react';
-import * as Linking from 'expo-linking';
-import { router, useLocalSearchParams } from 'expo-router';
 
-import { StatusBar } from 'expo-status-bar';
+import { useLocalSearchParams } from 'expo-router';
+
 import { Progressbar } from 'components/Progressbar';
 import { useSharedValue, withSpring } from 'react-native-reanimated';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { scale } from 'utils/metrics';
-import { Result_Imgs, backgroundImage } from 'assets/imgs';
+
+import { Happy_Faces_Imgs, Result_Imgs, Unhappy_Faces_Imgs, backgroundImage } from 'assets/imgs';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
 import {
@@ -29,14 +18,15 @@ import {
 } from 'redux/slices/difficultySlice';
 import { resetGame } from 'redux/slices/gameSlice';
 import { DIFFICULTIES } from 'constants/difficulties';
-import { ResultScreenString } from 'constants/strings';
-import { ROUTES } from 'constants/routes';
-
-const { width, height } = Dimensions.get('window');
-const IMG_SIZE = width > 600 ? 200 : 100;
+import { RESULT_SCREEN_STRING } from 'constants/strings';
+import { Header } from 'components/Result/Header';
+import { Footer } from 'components/Result/Footer';
+import { UNIVERSAL_STYLES } from 'constants/universalStyles';
+import { FONTS } from 'constants/fonts';
+import { getRandomImg } from 'utils/getRandom';
 
 const Result = () => {
-  const { targetWord, isWordGuessed } = useLocalSearchParams();
+  const { target, isWordGuessed } = useLocalSearchParams();
 
   const dispatch = useDispatch();
 
@@ -44,8 +34,6 @@ const Result = () => {
   const progress = useSelector(
     (state: RootState) => state.difficulty.difficulties[difficulty].currentProgress,
   );
-
-  const isPlayable = useSelector((state: RootState) => state.difficulty.isPlayable);
   const inUnguessed = useSelector((state: RootState) => state.difficulty.isUnguessedWords);
 
   const progressbarValue = useSharedValue(0);
@@ -58,11 +46,11 @@ const Result = () => {
     if (isWordGuessed === 'true') {
       dispatch(increaseProgress());
       if (inUnguessed) {
-        dispatch(removeFromUnguessedWords(targetWord));
+        dispatch(removeFromUnguessedWords(target));
       }
     } else {
       if (!inUnguessed) {
-        dispatch(addToUnguessedWords(targetWord));
+        dispatch(addToUnguessedWords(target));
       }
     }
     dispatch(setIsPlayable());
@@ -70,58 +58,29 @@ const Result = () => {
     dispatch(resetGame());
   }, []);
 
-  const handleExit = () => {
-    router.back();
-  };
-
-  const handleNextGame = () => {
-    if (isPlayable) {
-      router.replace(ROUTES.GAME);
-    } else {
-      Alert.alert(ResultScreenString.HINT_ALERT_TITLE, ResultScreenString.HINT_ALERT_TEXT, [
-        {
-          text: 'Выбраць складанасць',
-          onPress: () => {
-            router.replace(ROUTES.DIFFICULTY);
-          },
-        },
-        {
-          text: 'Ok',
-          onPress: () => {
-            router.back();
-          },
-        },
-      ]);
-    }
-  };
-
   return (
-    <ImageBackground style={[{ width, height }]} imageStyle={{ flex: 1 }} source={backgroundImage}>
-      <StatusBar hidden />
+    <ImageBackground
+      style={UNIVERSAL_STYLES.fullscreen}
+      imageStyle={{ flex: 1 }}
+      source={backgroundImage}
+    >
       <View style={styles.container}>
-        <View style={[styles.header]}>
-          <Ionicons name="arrow-back-outline" color={'white'} size={32} onPress={handleExit} />
-          <Text style={styles.headerTxt}>{DIFFICULTIES[difficulty].name}</Text>
-          <View style={{ width: 32 }} />
-        </View>
+        <Header difficulty={difficulty} />
         <View style={styles.mainContainer}>
           <Image
-            style={{ alignSelf: 'center', width: IMG_SIZE, resizeMode: 'contain' }}
-            source={isWordGuessed === 'true' ? Result_Imgs.succes : Result_Imgs.failure}
+            style={styles.mainImg}
+            source={
+              isWordGuessed === 'true'
+                ? getRandomImg(Happy_Faces_Imgs)
+                : getRandomImg(Unhappy_Faces_Imgs)
+            }
           />
-          <Text
-            style={[
-              styles.txt,
-              { alignSelf: 'center', fontFamily: 'JetBrainsMono-Medium', fontSize: 24 },
-            ]}
-          >
-            {isWordGuessed === 'true'
-              ? ResultScreenString.SUCCESS_TEXT
-              : ResultScreenString.FAILURE_TEXT}
+          <Text style={[styles.txt, styles.title]}>
+            {isWordGuessed === 'true' ? RESULT_SCREEN_STRING.success : RESULT_SCREEN_STRING.failure}
           </Text>
           <View style={styles.mainContent}>
-            <Text style={styles.txt}>Правильное слово:</Text>
-            <Text style={[styles.txt, styles.targetWord]}> {targetWord}</Text>
+            <Text style={styles.txt}>{RESULT_SCREEN_STRING.correctWord}</Text>
+            <Text style={[styles.txt, styles.targetWord]}> {target}</Text>
           </View>
           <Progressbar
             progress={progressbarValue}
@@ -130,28 +89,7 @@ const Result = () => {
             total={totalLength}
           />
         </View>
-        <View style={[styles.footer]}>
-          <Pressable
-            style={({ pressed }) =>
-              pressed ? [styles.btn, styles.txtBtn, { opacity: 0.7 }] : [styles.btn, styles.txtBtn]
-            }
-            onPress={() => Linking.openURL(`https://ru.wiktionary.org/wiki/${targetWord}`)}
-          >
-            <Ionicons name="book-outline" color={'#F6E7BE'} size={24} />
-            <Text style={[styles.btnTxt, styles.txtBtnTxt]}>Значение слова</Text>
-          </Pressable>
-          <Pressable
-            onPress={handleNextGame}
-            style={({ pressed }) =>
-              pressed
-                ? [styles.btn, styles.fillBtn, { opacity: 0.7 }]
-                : [styles.btn, styles.fillBtn]
-            }
-          >
-            <Ionicons name="play-circle" color={'black'} size={24} />
-            <Text style={styles.btnTxt}>Играть дальше</Text>
-          </Pressable>
-        </View>
+        <Footer target={target} />
       </View>
     </ImageBackground>
   );
@@ -167,25 +105,16 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 24,
   },
-  header: {
-    width: '100%',
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  headerTxt: {
-    color: 'black',
-    fontFamily: 'JetBrainsMono-Bold',
-    fontSize: 20,
-    backgroundColor: '#F6E7BE',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
-  },
+  mainImg: { alignSelf: 'center', width: 100, height: 100, resizeMode: 'contain' },
   txt: {
     color: 'white',
-    fontFamily: 'JetBrainsMono-Regular',
+    fontFamily: FONTS.regular,
     fontSize: 20,
+    textAlign: 'center',
+  },
+  title: {
+    fontFamily: FONTS.medium,
+    fontSize: 24,
   },
   mainContainer: {
     gap: 16,
@@ -195,41 +124,8 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   targetWord: {
+    fontFamily: FONTS.bold,
     textTransform: 'uppercase',
-    fontFamily: 'JetBrainsMono-Bold',
     color: '#F6E7BE',
-  },
-  footer: {
-    width: '100%',
-    gap: 8,
-  },
-  btn: {
-    flexDirection: 'row',
-    gap: 4,
-
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    borderRadius: 8,
-  },
-  fillBtn: {
-    backgroundColor: '#F6E7BE',
-  },
-  txtBtn: {
-    backgroundColor: 'none',
-
-    borderColor: '#F6E7BE',
-  },
-
-  btnTxt: {
-    fontFamily: 'JetBrainsMono-Bold',
-    fontSize: 16,
-  },
-  txtBtnTxt: {
-    color: '#F6E7BE',
-  },
-  lottie: {
-    position: 'absolute',
-    top: -80,
   },
 });

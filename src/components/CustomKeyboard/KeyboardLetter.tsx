@@ -1,19 +1,26 @@
 import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 import { addLetter } from 'redux/slices/gameSlice';
-import { Layout } from 'constants/layout';
-import { moderateScale } from 'utils/metrics';
+
+import { FONT_SIZES, FONTS } from 'constants/fonts';
+import { Theme } from 'constants/theme';
 
 const { width } = Dimensions.get('window');
 
-const FONT_SIZE = width > 600 ? 24 : 20;
-const LETTER_WIDTH = width > 600 ? width / 28 : width / 14;
-
 export const KeyboardLetter = memo(
   ({ letter, color }: { letter: string; color: SharedValue<string> }) => {
+    const [isDoubleLetterVisible, setDoubleLetterVisible] = useState(false);
+    const [isDoubleLetterActive, setDoubleLetterActive] = useState(false);
+
     const dispatch = useDispatch();
+
+    const isDoubleLetter = letter === 'е';
+
+    const doubleLetterColor = isDoubleLetterActive
+      ? Theme.colors.activeKeyboardLetter
+      : Theme.colors.keyboardLetter;
 
     const animatedLetterStyle = useAnimatedStyle(() => {
       return {
@@ -21,35 +28,85 @@ export const KeyboardLetter = memo(
       };
     });
 
-    const handleKeyboardLetter = () => {
+    const handlePress = () => {
       dispatch(addLetter(letter));
     };
 
+    const handlePressOut = () => {
+      if (isDoubleLetter) {
+        if (isDoubleLetterActive) {
+          dispatch(addLetter('ё'));
+        }
+        setDoubleLetterActive(false);
+        setDoubleLetterVisible(false);
+      }
+    };
+
+    const handleLongPress = () => {
+      setDoubleLetterActive(true);
+    };
+
+    const handlePressIn = () => {
+      if (isDoubleLetter) {
+        setDoubleLetterVisible(true);
+      }
+    };
+
     return (
-      <Pressable
-        onPress={handleKeyboardLetter}
-        style={({ pressed }) => [pressed ? { opacity: 0.5 } : { opacity: 1 }]}
-      >
-        <Animated.View style={[styles.letterButton, animatedLetterStyle]}>
-          <Text style={styles.letterText}>{letter}</Text>
-        </Animated.View>
-      </Pressable>
+      <View>
+        {isDoubleLetterVisible && (
+          <View
+            style={[
+              styles.letterButton,
+              styles.doubleLetterContainer,
+              { backgroundColor: doubleLetterColor },
+            ]}
+          >
+            <Text style={styles.letterText}>ё</Text>
+          </View>
+        )}
+        <Pressable
+          onPress={handlePress}
+          onLongPress={handleLongPress}
+          onPressIn={handlePressIn}
+          onPressOut={handlePressOut}
+          style={({ pressed }) => (pressed ? { opacity: 0.7 } : { opacity: 1 })}
+        >
+          <Animated.View style={[styles.letterButton, animatedLetterStyle]}>
+            {isDoubleLetter && <Text style={styles.doubleLetter}>ё</Text>}
+            <Text style={styles.letterText}>{letter}</Text>
+          </Animated.View>
+        </Pressable>
+      </View>
     );
   },
 );
 
 const styles = StyleSheet.create({
   letterButton: {
-    width: LETTER_WIDTH,
-    paddingVertical: 12,
+    width: width / 15,
+    paddingVertical: 10,
     backgroundColor: '#363229',
-    margin: 2,
+    margin: 3,
     alignItems: 'center',
     borderRadius: 4,
   },
   letterText: {
-    fontSize: FONT_SIZE,
-    fontFamily: 'JetBrainsMono-Bold',
+    fontSize: FONT_SIZES.smallScreen.headingSmall,
+    fontFamily: FONTS.medium,
     color: 'white',
+  },
+  doubleLetter: {
+    position: 'absolute',
+    color: 'white',
+    fontFamily: FONTS.medium,
+    right: 1,
+    top: 1,
+  },
+  doubleLetterContainer: {
+    position: 'absolute',
+    width: width / 10,
+    paddingVertical: 16,
+    top: -72,
   },
 });

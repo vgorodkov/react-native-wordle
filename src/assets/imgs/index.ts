@@ -10,3 +10,15 @@ export const Result_Imgs = {
   succes: require('./happy_sun.png'),
   failure: require('./unhappy_sun.png'),
 };
+
+export const Happy_Faces_Imgs = [
+  require('./happy_face_1.png'),
+  require('./happy_face_2.png'),
+  require('./happy_face_3.png'),
+];
+
+export const Unhappy_Faces_Imgs = [
+  require('./unhappy_face_1.png'),
+  require('./unhappy_face_2.png'),
+  require('./unhappy_face_3.png'),
+];

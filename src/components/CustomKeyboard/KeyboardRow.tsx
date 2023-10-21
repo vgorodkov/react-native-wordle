@@ -28,14 +28,6 @@ const DeleteBtn = () => {
   );
 };
 
-const EmptyBtn = () => {
-  return (
-    <View style={styles.deleteBtn}>
-      <Text style={styles.enterBtnTxt}>Enter</Text>
-    </View>
-  );
-};
-
 export const KeyboardRow = memo(
   ({
     rowIndex,
@@ -51,9 +43,6 @@ export const KeyboardRow = memo(
         {row.split('').map((item, index) => {
           if (item === 'd') {
             return <DeleteBtn key={index} />;
-          }
-          if (item === 'e') {
-            return <EmptyBtn key={index} />;
           }
           return <KeyboardLetter key={index} letter={item} color={colors[rowIndex][index]} />;
         })}

@@ -1,30 +1,30 @@
 import { Difficulty_Imgs } from 'assets/imgs';
 import { WORDS_BY_DIFFICULTY, Difficulties } from 'redux/slices/difficultySlice';
-import { DifficultiesScreenString } from './strings';
+import { DIFFICULTIES_SCREEN_STRING } from './strings';
 
 export const DIFFICULTIES = [
   {
-    description: DifficultiesScreenString.EASY_DESCRIPTION,
+    description: DIFFICULTIES_SCREEN_STRING.easyDescription,
     img: Difficulty_Imgs.difficulty_0,
-    name: DifficultiesScreenString.EASY,
-    length: WORDS_BY_DIFFICULTY[Difficulties.Easy].length,
+    name: DIFFICULTIES_SCREEN_STRING.easy,
+    length: WORDS_BY_DIFFICULTY[Difficulties.easy].length,
   },
   {
-    description: DifficultiesScreenString.MEDIUM_DESCRIPTION,
+    description: DIFFICULTIES_SCREEN_STRING.mediumDescription,
     img: Difficulty_Imgs.difficulty_1,
-    name: DifficultiesScreenString.MEDIUM,
+    name: DIFFICULTIES_SCREEN_STRING.medium,
     length: WORDS_BY_DIFFICULTY[Difficulties.Medium].length,
   },
   {
-    description: DifficultiesScreenString.HARD_DESCRIPTION,
+    description: DIFFICULTIES_SCREEN_STRING.hardDescription,
     img: Difficulty_Imgs.difficulty_2,
-    name: DifficultiesScreenString.HARD,
+    name: DIFFICULTIES_SCREEN_STRING.hard,
     length: WORDS_BY_DIFFICULTY[Difficulties.Hard].length,
   },
   {
-    description: DifficultiesScreenString.UNIVRESAL_DESCRIPTION,
+    description: DIFFICULTIES_SCREEN_STRING.universalDescription,
     img: Difficulty_Imgs.difficulty_3,
-    name: DifficultiesScreenString.UNIVERSAL,
+    name: DIFFICULTIES_SCREEN_STRING.universal,
     length: WORDS_BY_DIFFICULTY[Difficulties.Universal].length,
   },
 ];

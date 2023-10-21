@@ -4,8 +4,10 @@ import React from 'react';
 import { ColorHint } from './ColorHints';
 import { ExampleLetter } from './ExampleLetter';
 import { Theme } from 'constants/theme';
-import { RulesScreenString } from 'constants/strings';
+import { RULES_SCREEN_STRING } from 'constants/strings';
 import { moderateScale, scale } from 'utils/metrics';
+import { FONT_SIZES, FONTS } from 'constants/fonts';
+import { LAYOUT } from 'constants/layout';
 
 const EXAMPLE = [
   { letter: 'К', bgColor: Theme.colors.notInWordLetter },
@@ -15,9 +17,9 @@ const EXAMPLE = [
   { letter: 'Н', bgColor: Theme.colors.notInWordLetter },
 ];
 const COLORS_HINTS = [
-  { color: Theme.colors.correctLetter, hintText: RulesScreenString.FIRST_HINT },
-  { color: Theme.colors.inWordLetter, hintText: RulesScreenString.SECOND_HINT },
-  { color: Theme.colors.notInWordLetter, hintText: RulesScreenString.THIRD_HINT },
+  { color: Theme.colors.correctLetter, hintText: RULES_SCREEN_STRING.firstHint },
+  { color: Theme.colors.inWordLetter, hintText: RULES_SCREEN_STRING.secondHint },
+  { color: Theme.colors.notInWordLetter, hintText: RULES_SCREEN_STRING.thirdHint },
 ];
 
 export const Example = ({ rule, index }: { rule: string; index: number }) => {
@@ -42,24 +44,21 @@ export const Example = ({ rule, index }: { rule: string; index: number }) => {
 
 const styles = StyleSheet.create({
   rulesContent: {
-    gap: 16,
+    gap: LAYOUT.defaultSpacing,
   },
   ruleTxt: {
-    textAlign: 'left',
-    fontSize: moderateScale(14, 1),
     color: 'white',
-    fontWeight: '500',
-    fontFamily: 'JetBrainsMono-Regular',
+    fontSize: FONT_SIZES.smallScreen.bodyText,
+    fontFamily: FONTS.regular,
   },
   exampleContainer: {
-    paddingVertical: 8,
+    paddingVertical: LAYOUT.smallSpacing,
     flexDirection: 'row',
     alignSelf: 'center',
-    gap: 8,
+    gap: LAYOUT.smallSpacing,
   },
-
   colorHintsContainer: {
     alignSelf: 'flex-end',
-    gap: 8,
+    gap: LAYOUT.smallSpacing,
   },
 });

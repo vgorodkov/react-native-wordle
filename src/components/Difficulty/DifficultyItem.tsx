@@ -1,9 +1,9 @@
 import { StyleSheet, Text, View, Image } from 'react-native';
 import React, { memo } from 'react';
 
-import { Layout } from 'constants/layout';
-import { scale } from 'utils/metrics';
+import { LAYOUT } from 'constants/layout';
 import { Theme } from 'constants/theme';
+import { FONT_SIZES, FONTS } from 'constants/fonts';
 
 export interface Difficultyitem {
   img: number;
@@ -16,7 +16,7 @@ interface DifficultyItemProps extends Difficultyitem {
   activeDifficulty: number;
 }
 
-const IMG_SIZE = scale(100);
+const IMG_SIZE = 100;
 
 export const DifficultyItem = memo(
   ({ description, difficultyIndex, activeDifficulty, img, name }: DifficultyItemProps) => {
@@ -24,10 +24,10 @@ export const DifficultyItem = memo(
 
     return (
       <View style={styles.difficultyItemContainer}>
-        <Text style={[styles.title, styles.txt, isActive && styles.activeTxt]}>{name}</Text>
+        <Text style={[styles.title, isActive && styles.activeTxt]}>{name}</Text>
         <View style={styles.difficultyItemContent}>
           <Image style={styles.img} source={img} />
-          <Text style={[styles.txt, styles.body]}>{description}</Text>
+          <Text style={[styles.body]}>{description}</Text>
         </View>
         <View />
       </View>
@@ -38,43 +38,42 @@ export const DifficultyItem = memo(
 export default DifficultyItem;
 
 const styles = StyleSheet.create({
-  txt: {
-    color: 'white',
-    fontFamily: 'JetBrainsMono-Bold',
-    fontSize: 20,
-    textAlign: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-  },
   activeTxt: {
     color: 'black',
     backgroundColor: Theme.colors.primary,
     borderRadius: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
   title: {
-    fontSize: 24,
+    color: 'white',
+    fontSize: FONT_SIZES.smallScreen.headingSmall,
     fontWeight: '700',
     alignSelf: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
   },
   body: {
-    fontSize: 18,
-    fontWeight: '500',
+    color: 'white',
+    textAlign: 'center',
+    fontFamily: FONTS.medium,
+    fontSize: FONT_SIZES.smallScreen.bodyText,
   },
   difficultyItemContainer: {
     flex: 1,
     alignSelf: 'center',
-    paddingHorizontal: Layout.mediumSpacing,
+    paddingHorizontal: LAYOUT.mediumSpacing,
     justifyContent: 'space-between',
-    paddingBottom: Layout.smallSpacing,
+    paddingBottom: LAYOUT.smallSpacing,
     width: '80%',
   },
   difficultyItemContent: {
-    gap: Layout.mediumSpacing,
+    gap: LAYOUT.mediumSpacing,
     alignItems: 'center',
   },
   img: {
     height: IMG_SIZE,
-    marginTop: Layout.mediumSpacing,
+    marginTop: LAYOUT.mediumSpacing,
     resizeMode: 'contain',
   },
 });

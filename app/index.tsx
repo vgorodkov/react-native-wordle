@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import { View, ImageBackground, Alert, StyleSheet, Dimensions } from 'react-native';
 import Animated, {
+  Easing,
   useAnimatedStyle,
   useSharedValue,
   withRepeat,
@@ -18,18 +19,20 @@ import { backgroundImage } from 'assets/imgs';
 import { RootState } from 'redux/store';
 
 import { ROUTES } from 'constants/routes';
-import { StartScreenString } from 'constants/strings';
+import { START_SCREEN_STRING } from 'constants/strings';
 import { DIFFICULTIES } from 'constants/difficulties';
+import { UNIVERSAL_STYLES } from 'constants/universalStyles';
+import { FONT_SIZES, FONTS } from 'constants/fonts';
+import { LAYOUT } from 'constants/layout';
 
 SplashScreen.preventAutoHideAsync();
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
 const ANIMATION_DURATION = width > 600 ? 65000 : 40000;
-const IMG_SIZE = width > 600 ? 200 : 100;
 const OFFSET_Y = 80;
-const PLAY_BTN_FONT_SIZE = width > 600 ? 32 : 24;
-const OTHER_BTN_FONT_SIZE = width > 600 ? 28 : 20;
+
+const IMG_SIZE = width > 600 ? 200 : 100;
 
 const Start = () => {
   const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
@@ -54,28 +57,37 @@ const Start = () => {
     if (fontsLoaded && !fontError) {
       translateX.value = withRepeat(
         withSequence(
-          withTiming(width - IMG_SIZE, { duration: ANIMATION_DURATION }),
-          withTiming(0, { duration: ANIMATION_DURATION }),
+          withTiming(width - IMG_SIZE, {
+            duration: ANIMATION_DURATION,
+            easing: Easing.inOut(Easing.linear),
+          }),
+          withTiming(0, { duration: ANIMATION_DURATION, easing: Easing.inOut(Easing.linear) }),
         ),
         -1,
       );
       translateY.value = withRepeat(
         withSequence(
-          withTiming(-OFFSET_Y, { duration: ANIMATION_DURATION }),
-          withTiming(OFFSET_Y, { duration: ANIMATION_DURATION }),
-          withTiming(0, { duration: ANIMATION_DURATION }),
+          withTiming(-OFFSET_Y, {
+            duration: ANIMATION_DURATION,
+            easing: Easing.inOut(Easing.linear),
+          }),
+          withTiming(OFFSET_Y, {
+            duration: ANIMATION_DURATION,
+            easing: Easing.inOut(Easing.linear),
+          }),
+          withTiming(0, { duration: ANIMATION_DURATION, easing: Easing.inOut(Easing.linear) }),
         ),
         -1,
       );
       getStoredStr('rules-opened').then((data) => {
         if (!data) {
-          router.push(ROUTES.RULES);
+          router.push(ROUTES.rules);
         }
       });
     }
   }, [fontsLoaded, fontError]);
 
-  const onLayoutRootView = useCallback(async () => {
+  const onLAYOUTRootView = useCallback(async () => {
     if (fontsLoaded || fontError) {
       await SplashScreen.hideAsync();
     }
@@ -84,13 +96,13 @@ const Start = () => {
   const handlePlayBtn = () => {
     if (!isPlayable) {
       Alert.alert(
-        StartScreenString.DIFFICULTY_ALERT_TITLE,
-        StartScreenString.DIFFICULTY_ALERT_MESSAGE,
+        START_SCREEN_STRING.difficultyAlertTitle,
+        START_SCREEN_STRING.difficultyAlertMessage,
         [
           {
-            text: StartScreenString.DIFFICULTY_BTN_TEXT,
+            text: START_SCREEN_STRING.difficultyBtn,
             onPress: () => {
-              router.push(ROUTES.DIFFICULTY);
+              router.push(ROUTES.difficulty);
             },
           },
           { text: 'Ok', onPress: () => {} },
@@ -100,29 +112,31 @@ const Start = () => {
   };
 
   if (!fontsLoaded && !fontError) {
-    return <ImageBackground resizeMode="cover" style={styles.bgImg} source={backgroundImage} />;
+    return (
+      <ImageBackground resizeMode="cover" style={styles.rootContainer} source={backgroundImage} />
+    );
   }
 
   return (
-    <View style={styles.container} onLayout={onLayoutRootView}>
+    <View style={styles.rootContainer} onLayout={onLAYOUTRootView}>
       <StatusBar hidden />
       <ImageBackground
         resizeMode="cover"
-        style={[styles.bgImg, { width, height }]}
+        style={[styles.contentContainer, UNIVERSAL_STYLES.fullscreen]}
         source={backgroundImage}
       >
         <Animated.Image
           style={[styles.difficultyImg, animatedImage]}
           source={DIFFICULTIES[difficulty].img}
         />
-        <Link style={styles.playBtn} onPress={handlePlayBtn} href={!isPlayable ? '' : ROUTES.GAME}>
-          {StartScreenString.PLAY_BTN_TEXT}
+        <Link style={styles.playBtn} onPress={handlePlayBtn} href={!isPlayable ? '' : ROUTES.game}>
+          {START_SCREEN_STRING.playBtn}
         </Link>
-        <Link style={styles.txt} href={ROUTES.DIFFICULTY}>
-          {StartScreenString.DIFFICULTY_BTN_TEXT}
+        <Link style={styles.txt} href={ROUTES.difficulty}>
+          {START_SCREEN_STRING.difficultyBtn}
         </Link>
-        <Link style={styles.txt} href={ROUTES.RULES}>
-          {StartScreenString.RULES_BTN_TEXT}
+        <Link style={styles.txt} href={ROUTES.rules}>
+          {START_SCREEN_STRING.rulesBtn}
         </Link>
       </ImageBackground>
     </View>
@@ -132,24 +146,24 @@ const Start = () => {
 export default Start;
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  playBtn: {
-    fontSize: PLAY_BTN_FONT_SIZE,
-    color: 'white',
-    fontFamily: 'JetBrainsMono-Bold',
-    borderBottomWidth: 4,
-    borderColor: 'white',
-  },
-  bgImg: {
+  rootContainer: { flex: 1 },
+  contentContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    gap: 12,
+    gap: LAYOUT.defaultSpacing,
+  },
+  playBtn: {
+    fontSize: FONT_SIZES.smallScreen.headingMedium,
+    color: 'white',
+    fontFamily: FONTS.bold,
+    borderBottomWidth: 4,
+    borderColor: 'white',
   },
   txt: {
-    fontSize: OTHER_BTN_FONT_SIZE,
+    fontSize: FONT_SIZES.smallScreen.headingSmall,
     color: 'lightgray',
-    fontFamily: 'JetBrainsMono-Bold',
+    fontFamily: FONTS.bold,
   },
   difficultyImg: {
     position: 'absolute',

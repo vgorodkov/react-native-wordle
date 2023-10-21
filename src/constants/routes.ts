@@ -1,6 +1,6 @@
 export const ROUTES = {
-  RULES: 'rules',
-  DIFFICULTY: 'difficulty',
-  GAME: 'game',
-  RESULT: 'result',
+  rules: 'rules',
+  difficulty: 'difficulty',
+  game: 'game',
+  result: 'result',
 };
