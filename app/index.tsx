@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react';
-import { View, ImageBackground, Alert, StyleSheet, Dimensions } from 'react-native';
+import { View, ImageBackground, Alert, StyleSheet, useWindowDimensions } from 'react-native';
 import Animated, {
   Easing,
   useAnimatedStyle,
@@ -8,33 +8,36 @@ import Animated, {
   withSequence,
   withTiming,
 } from 'react-native-reanimated';
+
 import { useSelector } from 'react-redux';
+import { RootState } from 'redux/store';
 import { Link, router } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
+
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 
-import { getStoredStr } from 'utils/asyncStorage';
 import { backgroundImage } from 'assets/imgs';
-import { RootState } from 'redux/store';
+
+import { getStoredStr } from 'utils/asyncStorage';
+import { scale } from 'utils/metrics';
 
 import { ROUTES } from 'constants/routes';
 import { START_SCREEN_STRING } from 'constants/strings';
-import { DIFFICULTIES } from 'constants/difficulties';
 import { UNIVERSAL_STYLES } from 'constants/universalStyles';
-import { FONT_SIZES, FONTS } from 'constants/fonts';
+import { FONTS, FONT_SIZES } from 'constants/fonts';
 import { LAYOUT } from 'constants/layout';
+import { DIFFICULTIES } from 'constants/difficulties';
 
-SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync(); //prevent while fonts are loading
 
-const { width } = Dimensions.get('window');
-
-const ANIMATION_DURATION = width > 600 ? 65000 : 40000;
 const OFFSET_Y = 80;
+const IMG_SIZE = scale(100);
 
-const IMG_SIZE = width > 600 ? 200 : 100;
+const ANIMATION_DURATION = 35000;
 
 const Start = () => {
+  const { width } = useWindowDimensions();
+
   const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
   const isPlayable = useSelector((state: RootState) => state.difficulty.isPlayable);
 
@@ -53,6 +56,7 @@ const Start = () => {
     };
   });
 
+  //image animation on main screen.
   useEffect(() => {
     if (fontsLoaded && !fontError) {
       translateX.value = withRepeat(
@@ -87,7 +91,7 @@ const Start = () => {
     }
   }, [fontsLoaded, fontError]);
 
-  const onLAYOUTRootView = useCallback(async () => {
+  const onLayoutRootView = useCallback(async () => {
     if (fontsLoaded || fontError) {
       await SplashScreen.hideAsync();
     }
@@ -113,29 +117,29 @@ const Start = () => {
 
   if (!fontsLoaded && !fontError) {
     return (
-      <ImageBackground resizeMode="cover" style={styles.rootContainer} source={backgroundImage} />
+      <ImageBackground
+        resizeMode="cover"
+        style={[styles.rootContainer, UNIVERSAL_STYLES.fullscreen]}
+        source={backgroundImage}
+      />
     );
   }
 
   return (
-    <View style={styles.rootContainer} onLayout={onLAYOUTRootView}>
-      <StatusBar hidden />
-      <ImageBackground
-        resizeMode="cover"
-        style={[styles.contentContainer, UNIVERSAL_STYLES.fullscreen]}
-        source={backgroundImage}
-      >
+    <View style={styles.rootContainer} onLayout={onLayoutRootView}>
+      <ImageBackground resizeMode="cover" style={styles.contentContainer} source={backgroundImage}>
         <Animated.Image
           style={[styles.difficultyImg, animatedImage]}
           source={DIFFICULTIES[difficulty].img}
         />
+
         <Link style={styles.playBtn} onPress={handlePlayBtn} href={!isPlayable ? '' : ROUTES.game}>
           {START_SCREEN_STRING.playBtn}
         </Link>
-        <Link style={styles.txt} href={ROUTES.difficulty}>
+        <Link style={styles.txtBtn} href={ROUTES.difficulty}>
           {START_SCREEN_STRING.difficultyBtn}
         </Link>
-        <Link style={styles.txt} href={ROUTES.rules}>
+        <Link style={styles.txtBtn} href={ROUTES.rules}>
           {START_SCREEN_STRING.rulesBtn}
         </Link>
       </ImageBackground>
@@ -160,8 +164,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 4,
     borderColor: 'white',
   },
-  txt: {
-    fontSize: FONT_SIZES.smallScreen.headingSmall,
+  txtBtn: {
+    fontSize: FONT_SIZES.smallScreen.subHeading,
     color: 'lightgray',
     fontFamily: FONTS.bold,
   },
@@ -169,8 +173,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 64,
     left: 64,
+    width: IMG_SIZE,
     height: IMG_SIZE,
     resizeMode: 'contain',
-    width: IMG_SIZE,
   },
 });

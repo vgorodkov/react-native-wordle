@@ -1,15 +1,17 @@
-import { StyleSheet, Text, View, Image, TouchableOpacity, Dimensions, Alert } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity, Alert } from 'react-native';
 import React from 'react';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { Link, router } from 'expo-router';
+import { Link } from 'expo-router';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
+import { setCorrectLetters, setHintWasUsed } from 'redux/slices/gameSlice';
+
 import { DIFFICULTIES } from 'constants/difficulties';
 import { LAYOUT } from 'constants/layout';
-import { setCorrectLetters, setHintWasUsed } from 'redux/slices/gameSlice';
 import { GAME_SCREEN_STRING } from 'constants/strings';
-import { Theme } from 'constants/theme';
+import { THEME } from 'constants/theme';
+import { FONT_SIZES } from 'constants/fonts';
 
 interface HeaderProps {
   target: string;
@@ -52,7 +54,11 @@ export const Header = ({ target }: HeaderProps) => {
       </View>
       <View style={styles.iconsContainer}>
         <Link asChild href={'rules'}>
-          <Ionicons name="help-circle-outline" color={Theme.colors.primary} size={32} />
+          <Ionicons
+            name="help-circle-outline"
+            color={THEME.colors.primary}
+            size={LAYOUT.defaultIconSize}
+          />
         </Link>
         <TouchableOpacity onPress={handleHint}>
           <Image source={require('assets/imgs/hint_bulb.png')} style={styles.hintIcon} />
@@ -71,12 +77,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: LAYOUT.mediumSpacing,
   },
   txt: {
-    fontSize: 20,
+    fontSize: FONT_SIZES.smallScreen.headingSmall,
     color: 'white',
     fontFamily: 'JetBrainsMono-Bold',
   },
   subTxt: {
-    fontSize: 16,
+    fontSize: FONT_SIZES.smallScreen.bodyText,
     color: 'white',
     fontFamily: 'JetBrainsMono-Medium',
   },

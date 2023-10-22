@@ -1,36 +1,34 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import {
+  View,
+  Text,
   FlatList,
   ImageBackground,
-  NativeScrollEvent,
-  Pressable,
   StyleSheet,
-  Text,
-  View,
   useWindowDimensions,
+  NativeScrollEvent,
 } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
+import { router } from 'expo-router';
 
 import DifficultyItem, { Difficultyitem } from 'components/Difficulty/DifficultyItem';
 import { Progressbar } from 'components/Progressbar';
 
-import { router } from 'expo-router';
-
-import { Difficulties, WORDS_BY_DIFFICULTY, changeDifficulty } from 'redux/slices/difficultySlice';
 import { RootState } from 'redux/store';
+import { useSelector } from 'react-redux';
+
+import { backgroundImage } from 'assets/imgs';
 
 import { LAYOUT } from 'constants/layout';
 import { DIFFICULTIES_SCREEN_STRING } from 'constants/strings';
-import { Difficulty_Imgs, backgroundImage } from 'assets/imgs';
-import { Theme } from 'constants/theme';
 import { DIFFICULTIES } from 'constants/difficulties';
 import { FONT_SIZES, FONTS } from 'constants/fonts';
+import { THEME } from 'constants/theme';
+import Footer from 'components/Difficulty/Footer';
 
 const Difficulty = () => {
   const { width, height } = useWindowDimensions();
 
-  const dispatch = useDispatch();
   const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
   const progresses = useSelector((state: RootState) => state.difficulty.difficulties);
 
@@ -80,10 +78,6 @@ const Difficulty = () => {
     setListIndex(Math.round(nativeEvent.contentOffset.x / width));
   };
 
-  const handleDifficultyChoice = () => {
-    dispatch(changeDifficulty(listIndex));
-  };
-
   return (
     <ImageBackground source={backgroundImage} style={styles.container}>
       <Ionicons
@@ -117,28 +111,16 @@ const Difficulty = () => {
         <Ionicons
           style={[styles.chevronIcon, { right: LAYOUT.smallSpacing }]}
           name="chevron-forward-outline"
-          size={32}
+          size={LAYOUT.defaultIconSize}
           color={'white'}
           onPress={handleScrollForward}
         />
       )}
       <View style={styles.progressbarContainer}>
         <Text style={[styles.progressBarHeaderTxt]}>{DIFFICULTIES_SCREEN_STRING.completed}</Text>
-        <Progressbar color={Theme.colors.primary} current={progress} total={total} />
+        <Progressbar color={THEME.colors.primary} current={progress} total={total} />
       </View>
-      <View style={styles.btnContainer}>
-        <Pressable
-          style={({ pressed }) =>
-            isCurrentDifficulty
-              ? [styles.btn, styles.disabledBtn]
-              : [styles.btn, { opacity: pressed ? 0.7 : 1 }]
-          }
-          disabled={isCurrentDifficulty}
-          onPress={handleDifficultyChoice}
-        >
-          <Text style={[styles.btnText]}>{DIFFICULTIES_SCREEN_STRING.chooseBtn}</Text>
-        </Pressable>
-      </View>
+      <Footer listIndex={listIndex} isCurrentDifficulty={isCurrentDifficulty} />
     </ImageBackground>
   );
 };
@@ -158,35 +140,14 @@ const styles = StyleSheet.create({
   },
   progressbarContainer: {
     gap: LAYOUT.smallSpacing,
-    paddingHorizontal: LAYOUT.mediumSpacing,
+    paddingHorizontal: LAYOUT.largeSpacing,
     marginBottom: LAYOUT.largeSpacing,
   },
   progressBarHeaderTxt: {
     color: 'white',
     fontFamily: FONTS.medium,
     textAlign: 'center',
-    fontSize: FONT_SIZES.smallScreen.subheading,
-  },
-  btnContainer: {
-    paddingHorizontal: LAYOUT.mediumSpacing,
-  },
-  btn: {
-    paddingHorizontal: LAYOUT.mediumSpacing,
-    paddingVertical: LAYOUT.smallSpacing,
-    borderWidth: 1,
-    borderColor: 'white',
-    backgroundColor: Theme.colors.primary,
-    borderRadius: 8,
-  },
-  disabledBtn: {
-    borderColor: Theme.colors.disabled,
-    backgroundColor: Theme.colors.disabled,
-  },
-  btnText: {
-    fontSize: FONT_SIZES.smallScreen.bodyText,
-    fontFamily: FONTS.bold,
-    color: 'black',
-    textAlign: 'center',
+    fontSize: FONT_SIZES.smallScreen.subHeading,
   },
   exitIcon: {
     position: 'absolute',

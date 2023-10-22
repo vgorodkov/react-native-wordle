@@ -5,12 +5,12 @@ import { useSharedValue } from 'react-native-reanimated';
 import { RootState } from 'redux/store';
 import { Difficulties, WORDS_BY_DIFFICULTY } from 'redux/slices/difficultySlice';
 
-import Letter from './Letter';
 import * as Haptics from 'expo-haptics';
-import { handleWordCheck } from 'utils/handleWordCheck';
-import { handleCorrectWord } from 'utils/handleWordAnimation';
 
-export const Row = memo(
+import { handleCorrectWord } from 'utils/handleWordAnimation';
+import { Letter } from './Letter';
+
+export const WordRow = memo(
   ({
     letters,
     rowIndex,

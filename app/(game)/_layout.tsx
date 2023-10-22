@@ -1,8 +1,8 @@
 import React from 'react';
 import { Slot } from 'expo-router';
 
-const LAYOUT = () => {
+const Layout = () => {
   return <Slot screenOptions={{ headerShown: false }} />;
 };
 
-export default LAYOUT;
+export default Layout;

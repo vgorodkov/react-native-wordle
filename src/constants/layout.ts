@@ -7,5 +7,7 @@ export const LAYOUT = {
   smallSpacing: 8,
   keyboardLetterSpacing: 10,
   wordBox: verticalScale(60),
-  defaultIconSize: 32,
+  defaultIconSize: moderateScale(32, 0.3),
+  smallIconSize: moderateScale(24, 0.3),
+  defaultBorderRadius: 16,
 };

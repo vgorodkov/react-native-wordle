@@ -3,7 +3,7 @@ import React, { useMemo } from 'react';
 
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
-import { Row } from './WordRow';
+import { WordRow } from './WordRow';
 
 const NUM_ROWS = 6;
 const NUM_COLS = 5;
@@ -20,7 +20,7 @@ export const Gameboard = ({ target }: { target: string }) => {
   return (
     <View style={styles.gameContainer}>
       {INITIAL_EMPTY_WORDS.map((item, index) => (
-        <Row
+        <WordRow
           target={target}
           currentCol={currentRow === index ? currentCol : -1}
           isActive={currentRow === index}

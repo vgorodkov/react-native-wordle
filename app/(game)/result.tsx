@@ -22,8 +22,16 @@ import { RESULT_SCREEN_STRING } from 'constants/strings';
 import { Header } from 'components/Result/Header';
 import { Footer } from 'components/Result/Footer';
 import { UNIVERSAL_STYLES } from 'constants/universalStyles';
-import { FONTS } from 'constants/fonts';
+import { FONTS, FONT_SIZES } from 'constants/fonts';
 import { getRandomImg } from 'utils/getRandom';
+
+const Emoji = ({ isGuessed }: { isGuessed: boolean }) => {
+  if (isGuessed) {
+    return <Text>&#x1F642;</Text>;
+  } else {
+    return <Text>&#x1F625;</Text>;
+  }
+};
 
 const Result = () => {
   const { target, isWordGuessed } = useLocalSearchParams();
@@ -65,22 +73,14 @@ const Result = () => {
       source={backgroundImage}
     >
       <View style={styles.container}>
-        <Header difficulty={difficulty} />
+        <Header isGuessed={isWordGuessed === 'true'} />
         <View style={styles.mainContainer}>
-          <Image
-            style={styles.mainImg}
-            source={
-              isWordGuessed === 'true'
-                ? getRandomImg(Happy_Faces_Imgs)
-                : getRandomImg(Unhappy_Faces_Imgs)
-            }
-          />
           <Text style={[styles.txt, styles.title]}>
             {isWordGuessed === 'true' ? RESULT_SCREEN_STRING.success : RESULT_SCREEN_STRING.failure}
+            <Emoji isGuessed={isWordGuessed === 'true'} />
           </Text>
           <View style={styles.mainContent}>
-            <Text style={styles.txt}>{RESULT_SCREEN_STRING.correctWord}</Text>
-            <Text style={[styles.txt, styles.targetWord]}> {target}</Text>
+            <Text style={[styles.txt, styles.targetWord]}>{target}</Text>
           </View>
           <Progressbar
             progress={progressbarValue}
@@ -89,6 +89,7 @@ const Result = () => {
             total={totalLength}
           />
         </View>
+
         <Footer target={target} />
       </View>
     </ImageBackground>
@@ -105,26 +106,26 @@ const styles = StyleSheet.create({
     gap: 8,
     padding: 24,
   },
-  mainImg: { alignSelf: 'center', width: 100, height: 100, resizeMode: 'contain' },
+
   txt: {
     color: 'white',
     fontFamily: FONTS.regular,
-    fontSize: 20,
+    fontSize: FONT_SIZES.smallScreen.subHeading,
     textAlign: 'center',
   },
   title: {
     fontFamily: FONTS.medium,
-    fontSize: 24,
+    fontSize: FONT_SIZES.smallScreen.headingMedium,
   },
   mainContainer: {
     gap: 16,
   },
   mainContent: {
     alignItems: 'center',
-    gap: 4,
   },
   targetWord: {
     fontFamily: FONTS.bold,
+    fontSize: FONT_SIZES.smallScreen.headingMedium,
     textTransform: 'uppercase',
     color: '#F6E7BE',
   },

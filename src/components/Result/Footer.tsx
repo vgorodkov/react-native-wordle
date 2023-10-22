@@ -8,7 +8,9 @@ import { ROUTES } from 'constants/routes';
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
 import { LAYOUT } from 'constants/layout';
-import { Theme } from 'constants/theme';
+import { THEME } from 'constants/theme';
+import { moderateScale } from 'utils/metrics';
+import { FONT_SIZES } from 'constants/fonts';
 
 interface BtnProps {
   onPress?: () => void;
@@ -80,8 +82,8 @@ export const Footer = ({ target }: { target: string }) => {
         variant="text"
         label={RESULT_SCREEN_STRING.definitionBtn}
         iconName="book-outline"
-        iconColor={Theme.colors.primary}
-        iconSize={24}
+        iconColor={THEME.colors.primary}
+        iconSize={LAYOUT.smallIconSize}
         onPress={openWikiWordDefinition}
       />
       <Btn
@@ -89,7 +91,7 @@ export const Footer = ({ target }: { target: string }) => {
         label={RESULT_SCREEN_STRING.nextBtn}
         iconName="play-circle"
         iconColor="black"
-        iconSize={24}
+        iconSize={LAYOUT.smallIconSize}
         onPress={handleNextGame}
       />
     </View>
@@ -99,7 +101,6 @@ export const Footer = ({ target }: { target: string }) => {
 const styles = StyleSheet.create({
   footer: {
     width: '100%',
-    gap: 8,
   },
   btn: {
     flexDirection: 'row',
@@ -107,7 +108,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     paddingVertical: 12,
-    borderRadius: 8,
+    borderRadius: LAYOUT.defaultBorderRadius,
   },
   fillBtn: {
     backgroundColor: '#F6E7BE',
@@ -118,7 +119,7 @@ const styles = StyleSheet.create({
   },
   btnTxt: {
     fontFamily: 'JetBrainsMono-Bold',
-    fontSize: 16,
+    fontSize: FONT_SIZES.smallScreen.bodyText,
   },
   txtBtnTxt: {
     color: '#F6E7BE',

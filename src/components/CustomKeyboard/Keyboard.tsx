@@ -10,7 +10,7 @@ import { handleKeyboardLetterAnimation } from 'utils/handleKeyboardLetter';
 import { Difficulties, WORDS_BY_DIFFICULTY } from 'redux/slices/difficultySlice';
 import { KeyboardRow } from './KeyboardRow';
 import { LAYOUT } from 'constants/layout';
-import { Theme } from 'constants/theme';
+import { THEME } from 'constants/theme';
 
 interface CustomKeyboardProps {
   target: string;
@@ -57,7 +57,7 @@ const CustomKeyboard = memo(({ target, wordsRef }: CustomKeyboardProps) => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    backgroundColor: Theme.colors.surfaceContainer,
+    backgroundColor: THEME.colors.surfaceContainer,
     paddingVertical: LAYOUT.defaultSpacing,
     paddingTop: LAYOUT.mediumSpacing,
   },

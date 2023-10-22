@@ -5,7 +5,7 @@ import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated
 import { addLetter } from 'redux/slices/gameSlice';
 
 import { FONT_SIZES, FONTS } from 'constants/fonts';
-import { Theme } from 'constants/theme';
+import { THEME } from 'constants/theme';
 
 const { width } = Dimensions.get('window');
 
@@ -19,8 +19,8 @@ export const KeyboardLetter = memo(
     const isDoubleLetter = letter === 'е';
 
     const doubleLetterColor = isDoubleLetterActive
-      ? Theme.colors.activeKeyboardLetter
-      : Theme.colors.keyboardLetter;
+      ? THEME.colors.activeKeyboardLetter
+      : THEME.colors.keyboardLetter;
 
     const animatedLetterStyle = useAnimatedStyle(() => {
       return {

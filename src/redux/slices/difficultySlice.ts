@@ -3,8 +3,13 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 
 import { getRandomWord } from 'utils/getRandomWord';
 
+import easyWords from 'data/be-5-easy-nouns.json';
+import mediumWords from 'data/be-5-medium-nouns.json';
+import hardWords from 'data/be-5-hard-nouns.json';
+import allWords from 'data/be-5-all-nouns.json';
+
 export enum Difficulties {
-  easy,
+  Easy,
   Medium,
   Hard,
   Universal,
@@ -16,10 +21,10 @@ type Difficulty = {
 };
 
 export const WORDS_BY_DIFFICULTY = {
-  [Difficulties.easy]: require('data/be-5-easy-nouns.json'),
-  [Difficulties.Medium]: require('data/be-5-medium-nouns.json'),
-  [Difficulties.Hard]: require('data/be-5-hard-nouns.json'),
-  [Difficulties.Universal]: require('data/be-5.json'),
+  [Difficulties.Easy]: easyWords,
+  [Difficulties.Medium]: mediumWords,
+  [Difficulties.Hard]: hardWords,
+  [Difficulties.Universal]: allWords,
 };
 
 export interface DifficultyState {
@@ -32,10 +37,10 @@ export interface DifficultyState {
 }
 
 const initialState: DifficultyState = {
-  difficulty: Difficulties.easy,
-  currentWord: WORDS_BY_DIFFICULTY[Difficulties.easy][0],
+  difficulty: Difficulties.Easy,
+  currentWord: WORDS_BY_DIFFICULTY[Difficulties.Easy][0],
   difficulties: {
-    [Difficulties.easy]: {
+    [Difficulties.Easy]: {
       currentProgress: 0,
       currentWordIndex: 0,
     },
@@ -53,7 +58,7 @@ const initialState: DifficultyState = {
     },
   },
   unguessedWordsByDifficulty: {
-    [Difficulties.easy]: [],
+    [Difficulties.Easy]: [],
     [Difficulties.Medium]: [],
     [Difficulties.Hard]: [],
     [Difficulties.Universal]: [],

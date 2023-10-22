@@ -1,4 +1,4 @@
-import { Theme } from 'constants/theme';
+import { THEME } from 'constants/theme';
 import { SharedValue, withSequence, withTiming } from 'react-native-reanimated';
 const ANIMATION_DURATION = 300;
 
@@ -11,7 +11,7 @@ export const handleCorrectWord = (word: string, target: string, colors: SharedVa
   for (let i = 0; i < word.length; i++) {
     if (word[i] === target[i]) {
       correctIndicies.push(i);
-      colors[i].value = withTiming(Theme.colors.correctLetter, {
+      colors[i].value = withTiming(THEME.colors.correctLetter, {
         duration: ANIMATION_DURATION * i,
       });
       newTarget = newTarget.replace(word[i], 's'); //remove from target correct letters and remain it with the same length.
@@ -21,11 +21,11 @@ export const handleCorrectWord = (word: string, target: string, colors: SharedVa
   for (let i = 0; i < word.length; i++) {
     if (!correctIndicies.includes(i)) {
       if (newTarget.includes(word[i])) {
-        colors[i].value = withTiming(Theme.colors.inWordLetter, {
+        colors[i].value = withTiming(THEME.colors.inWordLetter, {
           duration: ANIMATION_DURATION * (i + 1),
         });
       } else if (!correctIndicies.includes(i)) {
-        colors[i].value = withTiming(Theme.colors.notInWordLetter, {
+        colors[i].value = withTiming(THEME.colors.notInWordLetter, {
           duration: ANIMATION_DURATION * (i + 1),
         });
       }

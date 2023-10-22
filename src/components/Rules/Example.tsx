@@ -3,23 +3,23 @@ import React from 'react';
 
 import { ColorHint } from './ColorHints';
 import { ExampleLetter } from './ExampleLetter';
-import { Theme } from 'constants/theme';
+import { THEME } from 'constants/theme';
 import { RULES_SCREEN_STRING } from 'constants/strings';
-import { moderateScale, scale } from 'utils/metrics';
 import { FONT_SIZES, FONTS } from 'constants/fonts';
 import { LAYOUT } from 'constants/layout';
 
 const EXAMPLE = [
-  { letter: 'К', bgColor: Theme.colors.notInWordLetter },
-  { letter: 'А', bgColor: Theme.colors.correctLetter },
-  { letter: 'В', bgColor: Theme.colors.notInWordLetter },
-  { letter: 'У', bgColor: Theme.colors.inWordLetter },
-  { letter: 'Н', bgColor: Theme.colors.notInWordLetter },
+  { letter: 'К', bgColor: THEME.colors.notInWordLetter },
+  { letter: 'А', bgColor: THEME.colors.correctLetter },
+  { letter: 'В', bgColor: THEME.colors.notInWordLetter },
+  { letter: 'У', bgColor: THEME.colors.inWordLetter },
+  { letter: 'Н', bgColor: THEME.colors.notInWordLetter },
 ];
+
 const COLORS_HINTS = [
-  { color: Theme.colors.correctLetter, hintText: RULES_SCREEN_STRING.firstHint },
-  { color: Theme.colors.inWordLetter, hintText: RULES_SCREEN_STRING.secondHint },
-  { color: Theme.colors.notInWordLetter, hintText: RULES_SCREEN_STRING.thirdHint },
+  { color: THEME.colors.correctLetter, hintText: RULES_SCREEN_STRING.firstHint },
+  { color: THEME.colors.inWordLetter, hintText: RULES_SCREEN_STRING.secondHint },
+  { color: THEME.colors.notInWordLetter, hintText: RULES_SCREEN_STRING.thirdHint },
 ];
 
 export const Example = ({ rule, index }: { rule: string; index: number }) => {

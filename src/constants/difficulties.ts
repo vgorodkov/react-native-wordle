@@ -7,7 +7,7 @@ export const DIFFICULTIES = [
     description: DIFFICULTIES_SCREEN_STRING.easyDescription,
     img: Difficulty_Imgs.difficulty_0,
     name: DIFFICULTIES_SCREEN_STRING.easy,
-    length: WORDS_BY_DIFFICULTY[Difficulties.easy].length,
+    length: WORDS_BY_DIFFICULTY[Difficulties.Easy].length,
   },
   {
     description: DIFFICULTIES_SCREEN_STRING.mediumDescription,

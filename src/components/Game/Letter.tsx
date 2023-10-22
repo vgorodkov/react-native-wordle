@@ -1,8 +1,6 @@
-import { Dimensions, Pressable, StyleSheet, Text } from 'react-native';
+import { Pressable, StyleSheet, Text } from 'react-native';
 import React, { memo } from 'react';
-import { selectCurrentCol } from 'redux/slices/gameSlice';
-import { useDispatch, useSelector } from 'react-redux';
-import { LAYOUT } from 'constants/layout';
+
 import Animated, {
   SharedValue,
   useAnimatedReaction,
@@ -13,8 +11,13 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated';
+
+import { selectCurrentCol } from 'redux/slices/gameSlice';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
-import { Theme } from 'constants/theme';
+
+import { LAYOUT } from 'constants/layout';
+import { THEME } from 'constants/theme';
 import { FONT_SIZES, FONTS } from 'constants/fonts';
 
 interface LetterProps {
@@ -29,7 +32,7 @@ interface LetterProps {
 }
 
 const OFFSET = 5;
-const TIME = 300;
+const LETTER_ANIMATION_DURATION = 300;
 
 export const Letter = memo(
   ({
@@ -37,7 +40,6 @@ export const Letter = memo(
     letterIndex,
     isActive,
     isRowActive,
-    target,
     shouldCheck,
     isNotExistingWord,
     color,
@@ -52,7 +54,7 @@ export const Letter = memo(
     const translateY = useSharedValue(0);
     const rotationY = useSharedValue(0);
 
-    const borderColor = isActive ? Theme.colors.primary : 'white';
+    const borderColor = isActive ? THEME.colors.primary : 'white';
     const borderWidth = isActive ? 3 : 1;
 
     if (isActive) {
@@ -81,7 +83,9 @@ export const Letter = memo(
       () => shouldCheck,
       () => {
         if (shouldCheck.value) {
-          rotationY.value = withTiming(180, { duration: 300 * (letterIndex + 1) });
+          rotationY.value = withTiming(180, {
+            duration: LETTER_ANIMATION_DURATION * (letterIndex + 1),
+          });
 
           if (letterIndex > 4) {
             shouldCheck.value = false;
@@ -96,13 +100,13 @@ export const Letter = memo(
         if (isNotExistingWord.value) {
           scale.value = withSequence(withSpring(1.1), withSpring(1));
           translateX.value = withSequence(
-            withTiming(-OFFSET, { duration: TIME / 4 }),
-            withRepeat(withTiming(OFFSET, { duration: TIME / 4 }), 5, true),
-            withTiming(0, { duration: TIME / 4 }),
+            withTiming(-OFFSET, { duration: LETTER_ANIMATION_DURATION / 4 }),
+            withRepeat(withTiming(OFFSET, { duration: LETTER_ANIMATION_DURATION / 4 }), 5, true),
+            withTiming(0, { duration: LETTER_ANIMATION_DURATION / 4 }),
           );
           color.value = withSequence(
-            withTiming(Theme.colors.incorrectLetter, { duration: TIME }),
-            withTiming(Theme.colors.initialLetter, { duration: TIME }),
+            withTiming(THEME.colors.incorrectLetter, { duration: LETTER_ANIMATION_DURATION }),
+            withTiming(THEME.colors.initialLetter, { duration: LETTER_ANIMATION_DURATION }),
           );
         }
 
@@ -133,8 +137,6 @@ export const Letter = memo(
     );
   },
 );
-
-export default Letter;
 
 const styles = StyleSheet.create({
   wordBox: {

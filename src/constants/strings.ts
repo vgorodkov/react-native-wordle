@@ -12,9 +12,9 @@ export const DIFFICULTIES_SCREEN_STRING = {
   medium: 'Сярэдняя',
   hard: 'Складаная',
   universal: 'Універсальная',
-  easyDescription: 'Толькі назоўнікі. Простыя словы.',
-  mediumDescription: 'Усе часціны мовы. Простыя словы.',
-  hardDescription: 'Усе часціны мовы. Толькі складаныя словы.',
+  easyDescription: 'Толькі простыя назоўнікі.',
+  mediumDescription: 'Толькі сярэднія назоўнікі.',
+  hardDescription: 'Толькі складаныя назоўнікі.',
   universalDescription: 'Усе словы. Можа трапіцца як складанае, так і лёгкае слова.',
   completed: 'Пройдзена',
   chooseBtn: 'Выбраць',
@@ -36,9 +36,9 @@ export const GAME_SCREEN_STRING = {
 };
 
 export const RESULT_SCREEN_STRING = {
-  success: 'Вы прайшлі!',
-  failure: 'Вы не прайшлі!',
-  correctWord: 'Правільнае слова:',
+  success: 'Правільна',
+  failure: 'Няправільна',
+  correctWord: 'Слова:',
   definitionBtn: 'Значэнне слова',
   nextBtn: 'Гуляць далей',
 };

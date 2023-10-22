@@ -2,8 +2,9 @@ import { StyleSheet, Text, View, Image } from 'react-native';
 import React, { memo } from 'react';
 
 import { LAYOUT } from 'constants/layout';
-import { Theme } from 'constants/theme';
+import { THEME } from 'constants/theme';
 import { FONT_SIZES, FONTS } from 'constants/fonts';
+import { moderateScale } from 'utils/metrics';
 
 export interface Difficultyitem {
   img: number;
@@ -16,7 +17,7 @@ interface DifficultyItemProps extends Difficultyitem {
   activeDifficulty: number;
 }
 
-const IMG_SIZE = 100;
+const IMG_SIZE = moderateScale(100, 0.5);
 
 export const DifficultyItem = memo(
   ({ description, difficultyIndex, activeDifficulty, img, name }: DifficultyItemProps) => {
@@ -40,24 +41,24 @@ export default DifficultyItem;
 const styles = StyleSheet.create({
   activeTxt: {
     color: 'black',
-    backgroundColor: Theme.colors.primary,
-    borderRadius: 8,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    backgroundColor: THEME.colors.primary,
+    borderRadius: LAYOUT.defaultBorderRadius,
+    paddingVertical: LAYOUT.smallSpacing,
+    paddingHorizontal: LAYOUT.defaultSpacing,
   },
   title: {
     color: 'white',
     fontSize: FONT_SIZES.smallScreen.headingSmall,
-    fontWeight: '700',
+    fontFamily: FONTS.bold,
     alignSelf: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
+    paddingVertical: LAYOUT.smallSpacing,
+    paddingHorizontal: LAYOUT.defaultSpacing,
   },
   body: {
     color: 'white',
     textAlign: 'center',
     fontFamily: FONTS.medium,
-    fontSize: FONT_SIZES.smallScreen.bodyText,
+    fontSize: FONT_SIZES.smallScreen.subHeading,
   },
   difficultyItemContainer: {
     flex: 1,

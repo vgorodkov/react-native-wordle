@@ -1,12 +1,15 @@
 import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect } from 'react';
-import { Example } from 'components/Rules/Example';
-import Ionicons from '@expo/vector-icons/Ionicons';
 
+import Ionicons from '@expo/vector-icons/Ionicons';
 import { Link } from 'expo-router';
 
+import { Example } from 'components/Rules/Example';
+
 import { storeStr } from 'utils/asyncStorage';
+
 import { backgroundImage } from 'assets/imgs';
+
 import { RULES_SCREEN_STRING } from 'constants/strings';
 import { LAYOUT } from 'constants/layout';
 import { FONT_SIZES, FONTS } from 'constants/fonts';

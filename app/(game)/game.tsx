@@ -11,11 +11,10 @@ import { ROUTES } from 'constants/routes';
 
 import CustomKeyboard from 'components/CustomKeyboard/Keyboard';
 import { backgroundImage } from 'assets/imgs';
-import { Header } from 'components/Header';
 
 import { UNIVERSAL_STYLES } from 'constants/universalStyles';
 import { Loading } from 'components/Loading';
-import { Gameboard } from 'components/Game/Gameboard';
+import { Gameboard, Header } from 'components/Game';
 
 const getCorrectLetters = (target: string, word: string) => {
   const correctLetters = ['', '', '', '', ''];
@@ -28,6 +27,7 @@ const getCorrectLetters = (target: string, word: string) => {
 };
 
 const NUM_COLS = 5;
+const LETTER_ANIMATION_DURATION = 300;
 
 const Game = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -37,9 +37,9 @@ const Game = () => {
   const words = useSelector((state: RootState) => state.game.words);
   const word = useSelector((state: RootState) => state.game.currentWord);
 
-  const wordsRef = useRef(words);
-
   const dispatch = useDispatch();
+
+  const wordsRef = useRef(words);
 
   const isWordGuessed = word === target;
 
@@ -49,11 +49,11 @@ const Game = () => {
   };
 
   if (isGameEnded) {
-    setTimeout(() => handleGameEnd(isWordGuessed), 300 * NUM_COLS);
+    setTimeout(() => handleGameEnd(isWordGuessed), LETTER_ANIMATION_DURATION * NUM_COLS);
   }
 
   if (isWordGuessed) {
-    setTimeout(() => handleGameEnd(isWordGuessed), 300 * NUM_COLS);
+    setTimeout(() => handleGameEnd(isWordGuessed), LETTER_ANIMATION_DURATION * NUM_COLS);
   }
 
   useEffect(() => {

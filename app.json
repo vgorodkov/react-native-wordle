@@ -10,7 +10,7 @@
       "backgroundColor": "#000000"
     },
     "androidStatusBar": {
-      "translucent": true
+      "hidden": true
     },
     "backgroundColor": "#000000",
     "scheme": "your-app-scheme",

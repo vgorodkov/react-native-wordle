@@ -1,13 +1,15 @@
 import { StyleSheet, Text, View, Dimensions } from 'react-native';
-import React, { useEffect } from 'react';
+import React from 'react';
 import Animated, {
   Easing,
   SharedValue,
   useAnimatedStyle,
-  useSharedValue,
+  useDerivedValue,
   withTiming,
 } from 'react-native-reanimated';
-import { Theme } from 'constants/theme';
+import { THEME } from 'constants/theme';
+import { LAYOUT } from 'constants/layout';
+import { FONTS, FONT_SIZES } from 'constants/fonts';
 
 interface ProgressbarProps {
   progress?: SharedValue<number>;
@@ -16,29 +18,28 @@ interface ProgressbarProps {
   total: string | number;
 }
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 const ANIMATION_DURATION = 500;
-const PROGRESS_BAR_HEIGHT = width > 600 ? 24 : 16;
-const PROGRESS_BAR_FONT_SIZE = width > 600 ? 16 : 12;
+const PROGRESS_BAR_HEIGHT = width > 600 ? 32 : 24;
 
-export const Progressbar = ({ color = Theme.colors.primary, current, total }: ProgressbarProps) => {
-  const progress = useSharedValue(0);
+export const Progressbar = ({ color = THEME.colors.primary, current, total }: ProgressbarProps) => {
+  const progress = useDerivedValue(
+    () =>
+      withTiming((+current * 100) / +total, {
+        duration: ANIMATION_DURATION,
+        easing: Easing.out(Easing.cubic),
+      }),
+    [current, total],
+  );
+
   const progressBarAnimatedStyle = useAnimatedStyle(() => {
     return {
       width: `${progress.value}%`,
     };
   });
 
-  useEffect(() => {
-    progress.value = withTiming((+current * 100) / +total, {
-      duration: ANIMATION_DURATION,
-      easing: Easing.out(Easing.cubic),
-    });
-  }, [current]);
-
   return (
-    <View style={{ justifyContent: 'center' }}>
-      <View style={[styles.progressbar, styles.backgroundProgressbar]} />
+    <View style={styles.progressbarContainer}>
       <Animated.View
         style={[styles.progressbar, { backgroundColor: color }, progressBarAnimatedStyle]}
       />
@@ -50,21 +51,23 @@ export const Progressbar = ({ color = Theme.colors.primary, current, total }: Pr
 };
 
 const styles = StyleSheet.create({
+  progressbarContainer: {
+    height: PROGRESS_BAR_HEIGHT,
+    backgroundColor: 'gray',
+    justifyContent: 'center',
+    overflow: 'hidden',
+    borderRadius: LAYOUT.defaultBorderRadius,
+  },
   progressbar: {
     height: PROGRESS_BAR_HEIGHT,
-    borderRadius: 4,
-  },
-  backgroundProgressbar: {
-    backgroundColor: 'gray',
-    position: 'absolute',
-    width: '100%',
-    borderRadius: 4,
+    width: 0,
+    borderRadius: LAYOUT.defaultBorderRadius,
   },
   progressbarLabel: {
     position: 'absolute',
     alignSelf: 'center',
-    fontSize: PROGRESS_BAR_FONT_SIZE,
+    fontSize: FONT_SIZES.smallScreen.smallText,
     color: 'black',
-    fontFamily: 'JetBrainsMono-Bold',
+    fontFamily: FONTS.bold,
   },
 });

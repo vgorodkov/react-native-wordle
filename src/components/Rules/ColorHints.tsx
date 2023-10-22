@@ -3,6 +3,7 @@ import React from 'react';
 
 import { FONTS } from 'constants/fonts';
 import { LAYOUT } from 'constants/layout';
+import { moderateScale } from 'utils/metrics';
 
 export const ColorHint = ({ hintText, bgColor }: { hintText: string; bgColor: string }) => {
   return (
@@ -26,7 +27,7 @@ const styles = StyleSheet.create({
     gap: LAYOUT.defaultSpacing,
   },
   colorHintTxt: {
-    fontSize: 12,
+    fontSize: moderateScale(10, 0.3),
     color: 'white',
     fontFamily: FONTS.medium,
   },
