@@ -6,6 +6,7 @@ import { THEME } from 'constants/theme';
 import { FONTS, FONT_SIZES } from 'constants/fonts';
 import { useDispatch } from 'react-redux';
 import { changeDifficulty } from 'redux/slices/difficultySlice';
+import { resetGame } from 'redux/slices/gameSlice';
 
 export const Footer = ({
   isCurrentDifficulty,
@@ -18,6 +19,7 @@ export const Footer = ({
 
   const chooseDifficulty = () => {
     dispatch(changeDifficulty(listIndex));
+    dispatch(resetGame());
   };
 
   return (
@@ -31,7 +33,7 @@ export const Footer = ({
         disabled={isCurrentDifficulty}
         onPress={chooseDifficulty}
       >
-        <Text style={[styles.btnText]}>{DIFFICULTIES_SCREEN_STRING.chooseBtn}</Text>
+        <Text style={styles.btnText}>{DIFFICULTIES_SCREEN_STRING.chooseBtn}</Text>
       </Pressable>
     </View>
   );
