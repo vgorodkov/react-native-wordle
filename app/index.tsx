@@ -130,12 +130,7 @@ const Start = () => {
           source={DIFFICULTIES[difficulty].img}
         />
 
-        <Link
-          testID="play-btn"
-          style={styles.playBtn}
-          onPress={handlePlayBtn}
-          href={!isPlayable ? '' : ROUTES.game}
-        >
+        <Link style={styles.playBtn} onPress={handlePlayBtn} href={!isPlayable ? '' : ROUTES.game}>
           {START_SCREEN_STRING.playBtn}
         </Link>
         <Link style={styles.txtBtn} href={ROUTES.difficulty}>

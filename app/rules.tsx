@@ -32,7 +32,7 @@ const Rules = () => {
   return (
     <ImageBackground source={backgroundImage} style={styles.container}>
       <View style={styles.header}>
-        <Link asChild href={'../'} testID="rules-back">
+        <Link asChild href={'../'}>
           <Ionicons
             style={styles.backBtn}
             size={LAYOUT.defaultIconSize}
