@@ -1,9 +1,10 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import React, { useMemo } from 'react';
 
 import { useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
 import { WordRow } from './WordRow';
+import { LAYOUT } from 'constants/layout';
 
 const NUM_ROWS = 6;
 const NUM_COLS = 5;
@@ -35,10 +36,8 @@ export const Gameboard = ({ target }: { target: string }) => {
 
 const styles = StyleSheet.create({
   gameContainer: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     gap: 4,
-    padding: 16,
   },
 });

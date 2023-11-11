@@ -1,4 +1,4 @@
-import { Dimensions, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Pressable, StyleSheet, View } from 'react-native';
 import React, { memo } from 'react';
 import { SharedValue } from 'react-native-reanimated';
 import { KeyboardLetter } from './KeyboardLetter';
@@ -6,9 +6,9 @@ import Ionicons from '@expo/vector-icons/Ionicons';
 import { useDispatch } from 'react-redux';
 import { deleteAllLetters, deleteLetter } from 'redux/slices/gameSlice';
 
-const { width } = Dimensions.get('window');
+import { moderateScale } from 'utils/metrics';
 
-const DELETE_BTN_SIZE = width > 600 ? 72 : 48;
+const { width } = Dimensions.get('window');
 
 const DeleteBtn = () => {
   const dispatch = useDispatch();
@@ -23,7 +23,7 @@ const DeleteBtn = () => {
 
   return (
     <Pressable onPress={onDeletePress} onLongPress={onLongDeletePress} style={styles.deleteBtn}>
-      <Ionicons size={20} color={'white'} name="trash-outline" />
+      <Ionicons size={moderateScale(20, 0.5)} color={'white'} name="trash-outline" />
     </Pressable>
   );
 };
@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   deleteBtn: {
-    width: DELETE_BTN_SIZE,
+    width: width / 9,
     backgroundColor: '#332936',
     margin: 2,
     alignItems: 'center',

@@ -27,6 +27,8 @@ import { UNIVERSAL_STYLES } from 'constants/universalStyles';
 import { FONTS, FONT_SIZES } from 'constants/fonts';
 import { LAYOUT } from 'constants/layout';
 import { DIFFICULTIES } from 'constants/difficulties';
+import { StatusBar } from 'expo-status-bar';
+import { Loading } from 'components/Loading';
 
 SplashScreen.preventAutoHideAsync(); //prevent while fonts are loading
 
@@ -116,24 +118,24 @@ const Start = () => {
   };
 
   if (!fontsLoaded && !fontError) {
-    return (
-      <ImageBackground
-        resizeMode="cover"
-        style={[styles.rootContainer, UNIVERSAL_STYLES.fullscreen]}
-        source={backgroundImage}
-      />
-    );
+    return <Loading />;
   }
 
   return (
     <View style={styles.rootContainer} onLayout={onLayoutRootView}>
+      <StatusBar hidden />
       <ImageBackground resizeMode="cover" style={styles.contentContainer} source={backgroundImage}>
         <Animated.Image
           style={[styles.difficultyImg, animatedImage]}
           source={DIFFICULTIES[difficulty].img}
         />
 
-        <Link style={styles.playBtn} onPress={handlePlayBtn} href={!isPlayable ? '' : ROUTES.game}>
+        <Link
+          testID="play-btn"
+          style={styles.playBtn}
+          onPress={handlePlayBtn}
+          href={!isPlayable ? '' : ROUTES.game}
+        >
           {START_SCREEN_STRING.playBtn}
         </Link>
         <Link style={styles.txtBtn} href={ROUTES.difficulty}>

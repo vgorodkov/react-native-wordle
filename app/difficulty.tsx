@@ -82,7 +82,7 @@ const Difficulty = () => {
     <ImageBackground source={backgroundImage} style={styles.container}>
       <Ionicons
         style={styles.exitIcon}
-        name="exit-outline"
+        name="arrow-back"
         size={LAYOUT.defaultIconSize}
         color={'white'}
         onPress={() => router.back()}
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   exitIcon: {
     position: 'absolute',
     top: LAYOUT.mediumSpacing + 4,
-    right: LAYOUT.defaultSpacing,
+    left: LAYOUT.defaultSpacing,
     zIndex: 100,
   },
 });

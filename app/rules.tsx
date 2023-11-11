@@ -13,6 +13,7 @@ import { backgroundImage } from 'assets/imgs';
 import { RULES_SCREEN_STRING } from 'constants/strings';
 import { LAYOUT } from 'constants/layout';
 import { FONT_SIZES, FONTS } from 'constants/fonts';
+import { THEME } from 'constants/theme';
 
 const RULES = [
   RULES_SCREEN_STRING.firstRule,
@@ -30,14 +31,18 @@ const Rules = () => {
 
   return (
     <ImageBackground source={backgroundImage} style={styles.container}>
-      <Link asChild href={'../'}>
-        <Ionicons
-          style={styles.backBtn}
-          size={LAYOUT.defaultIconSize}
-          color={'white'}
-          name="exit-outline"
-        />
-      </Link>
+      <View style={styles.header}>
+        <Link asChild href={'../'} testID="rules-back">
+          <Ionicons
+            style={styles.backBtn}
+            size={LAYOUT.defaultIconSize}
+            color={'white'}
+            name="arrow-back"
+          />
+        </Link>
+        <Text style={styles.headerTxt}>Правілы</Text>
+        <View style={{ width: LAYOUT.defaultIconSize }} />
+      </View>
       <View style={styles.rulesContent}>
         {RULES.map((item, index) =>
           index === EXAMPLE_INDEX ? (
@@ -60,10 +65,23 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: LAYOUT.defaultSpacing,
   },
-  backBtn: {
-    alignSelf: 'flex-end',
-    paddingTop: LAYOUT.mediumSpacing,
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: LAYOUT.defaultSpacing,
+    marginBottom: LAYOUT.defaultSpacing,
   },
+  headerTxt: {
+    fontSize: FONT_SIZES.smallScreen.headingSmall,
+    fontFamily: FONTS.bold,
+    alignSelf: 'center',
+    paddingVertical: LAYOUT.smallSpacing,
+    paddingHorizontal: LAYOUT.defaultSpacing,
+    color: 'black',
+    backgroundColor: THEME.colors.primary,
+    borderRadius: LAYOUT.defaultBorderRadius,
+  },
+  backBtn: {},
   rulesContent: {
     gap: LAYOUT.defaultSpacing,
     paddingTop: LAYOUT.mediumSpacing,

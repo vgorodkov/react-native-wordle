@@ -1,5 +1,3 @@
-import { SharedValue } from 'react-native-reanimated';
-
 //check letters in a word and mark them as correct, inWord, notInword.
 export const handleWordCheck = (word: string, target: string) => {
   'worklet';

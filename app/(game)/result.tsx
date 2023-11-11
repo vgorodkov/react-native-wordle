@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, Text, View, Image } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect } from 'react';
 
 import { useLocalSearchParams } from 'expo-router';
@@ -6,7 +6,7 @@ import { useLocalSearchParams } from 'expo-router';
 import { Progressbar } from 'components/Progressbar';
 import { useSharedValue, withSpring } from 'react-native-reanimated';
 
-import { Happy_Faces_Imgs, Result_Imgs, Unhappy_Faces_Imgs, backgroundImage } from 'assets/imgs';
+import { backgroundImage } from 'assets/imgs';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
 import {
@@ -67,11 +67,7 @@ const Result = () => {
   }, []);
 
   return (
-    <ImageBackground
-      style={UNIVERSAL_STYLES.fullscreen}
-      imageStyle={{ flex: 1 }}
-      source={backgroundImage}
-    >
+    <ImageBackground style={{ flex: 1 }} source={backgroundImage}>
       <View style={styles.container}>
         <Header isGuessed={isWordGuessed === 'true'} />
         <View style={styles.mainContainer}>

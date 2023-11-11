@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
     gap: LAYOUT.defaultSpacing,
   },
   colorHintTxt: {
-    fontSize: moderateScale(10, 0.3),
+    fontSize: moderateScale(11, 0.5),
     color: 'white',
     fontFamily: FONTS.medium,
   },
