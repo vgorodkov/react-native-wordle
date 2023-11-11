@@ -3,7 +3,12 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
-import { moveToNextRow, resetGame, setCorrectLetters } from 'redux/slices/gameSlice';
+import {
+  deleteAllLetters,
+  moveToNextRow,
+  resetGame,
+  setCorrectLetters,
+} from 'redux/slices/gameSlice';
 import { Difficulties, WORDS_BY_DIFFICULTY } from 'redux/slices/difficultySlice';
 
 import { router } from 'expo-router';
@@ -15,6 +20,7 @@ import { backgroundImage } from 'assets/imgs';
 import { UNIVERSAL_STYLES } from 'constants/universalStyles';
 import { Loading } from 'components/Loading';
 import { Gameboard, Header } from 'components/Game';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getCorrectLetters = (target: string, word: string) => {
   const correctLetters = ['', '', '', '', ''];
@@ -67,6 +73,7 @@ const Game = () => {
   }, [word]);
 
   useEffect(() => {
+    dispatch(deleteAllLetters());
     InteractionManager.runAfterInteractions(() => setIsLoading(false));
   }, []);
 
