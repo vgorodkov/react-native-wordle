@@ -22,7 +22,11 @@ const DeleteBtn = () => {
   };
 
   return (
-    <Pressable onPress={onDeletePress} onLongPress={onLongDeletePress} style={styles.deleteBtn}>
+    <Pressable
+      onPress={onDeletePress}
+      onLongPress={onLongDeletePress}
+      style={({ pressed }) => (pressed ? [styles.deleteBtn, { opacity: 0.8 }] : styles.deleteBtn)}
+    >
       <Ionicons size={moderateScale(20, 0.5)} color={'white'} name="trash-outline" />
     </Pressable>
   );

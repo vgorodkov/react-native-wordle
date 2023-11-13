@@ -61,7 +61,10 @@ export const Header = ({ target }: HeaderProps) => {
           />
         </Link>
         <TouchableOpacity onPress={handleHint}>
-          <Image source={require('assets/imgs/hint_bulb.png')} style={styles.hintIcon} />
+          <Image
+            source={require('assets/imgs/hint_bulb.png')}
+            style={hintWasUsed ? [styles.hintIcon, { opacity: 0.3 }] : styles.hintIcon}
+          />
         </TouchableOpacity>
       </View>
     </View>

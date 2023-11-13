@@ -23,7 +23,6 @@ import { scale } from 'utils/metrics';
 
 import { ROUTES } from 'constants/routes';
 import { START_SCREEN_STRING } from 'constants/strings';
-import { UNIVERSAL_STYLES } from 'constants/universalStyles';
 import { FONTS, FONT_SIZES } from 'constants/fonts';
 import { LAYOUT } from 'constants/layout';
 import { DIFFICULTIES } from 'constants/difficulties';

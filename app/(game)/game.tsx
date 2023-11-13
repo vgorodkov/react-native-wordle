@@ -20,7 +20,6 @@ import { backgroundImage } from 'assets/imgs';
 import { UNIVERSAL_STYLES } from 'constants/universalStyles';
 import { Loading } from 'components/Loading';
 import { Gameboard, Header } from 'components/Game';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const getCorrectLetters = (target: string, word: string) => {
   const correctLetters = ['', '', '', '', ''];
@@ -39,6 +38,7 @@ const Game = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   const target = useSelector((state: RootState) => state.difficulty.currentWord);
+
   const isGameEnded = useSelector((state: RootState) => state.game.isGameEnded);
   const words = useSelector((state: RootState) => state.game.words);
   const word = useSelector((state: RootState) => state.game.currentWord);
@@ -73,6 +73,7 @@ const Game = () => {
   }, [word]);
 
   useEffect(() => {
+    //reset current row to empty word
     dispatch(deleteAllLetters());
     InteractionManager.runAfterInteractions(() => setIsLoading(false));
   }, []);
