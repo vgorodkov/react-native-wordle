@@ -53,8 +53,12 @@ export const Letter = memo(
       return 1;
     });
 
-    const borderColor = isActive ? THEME.colors.primary : 'white';
-    const borderWidth = isActive ? 3 : 1;
+    const borderColor = isActive
+      ? THEME.colors.primary
+      : letter !== ''
+      ? 'white'
+      : 'rgba(255,255,255,0.5)';
+    const borderWidth = isActive ? 4 : 2;
 
     const letterStyle = useAnimatedStyle(() => {
       return {
@@ -106,6 +110,6 @@ const styles = StyleSheet.create({
     fontFamily: FONTS.bold,
   },
   inactiveLetter: {
-    color: 'rgba(255,255,255,0.4)',
+    color: 'rgba(255,255,255,0.3)',
   },
 });
