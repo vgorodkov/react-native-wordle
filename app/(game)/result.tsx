@@ -1,4 +1,4 @@
-import { ImageBackground, StyleSheet, Text, View } from 'react-native';
+import { Alert, ImageBackground, Linking, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect } from 'react';
 
 import { useLocalSearchParams } from 'expo-router';
@@ -21,9 +21,8 @@ import { DIFFICULTIES } from 'constants/difficulties';
 import { RESULT_SCREEN_STRING } from 'constants/strings';
 import { Header } from 'components/Result/Header';
 import { Footer } from 'components/Result/Footer';
-import { UNIVERSAL_STYLES } from 'constants/universalStyles';
 import { FONTS, FONT_SIZES } from 'constants/fonts';
-import { getRandomImg } from 'utils/getRandom';
+import { getStoredStr, storeStr } from 'utils/asyncStorage';
 
 const Emoji = ({ isGuessed }: { isGuessed: boolean }) => {
   if (isGuessed) {
@@ -33,10 +32,12 @@ const Emoji = ({ isGuessed }: { isGuessed: boolean }) => {
   }
 };
 
+const ASYNC_RATED_STRING = 'hasRated'; //whether the user rate the app at play store
+
+const PLAYSTORE_LINK = 'https://play.google.com/store/apps/details?id=com.tragediabelok.wordle';
+
 const Result = () => {
   const { target, isWordGuessed } = useLocalSearchParams();
-
-  const dispatch = useDispatch();
 
   const difficulty = useSelector((state: RootState) => state.difficulty.difficulty);
   const progress = useSelector(
@@ -44,11 +45,36 @@ const Result = () => {
   );
   const inUnguessed = useSelector((state: RootState) => state.difficulty.isUnguessedWords);
 
-  const progressbarValue = useSharedValue(0);
+  const dispatch = useDispatch();
 
+  const progressbarValue = useSharedValue(0);
   const totalLength = DIFFICULTIES[difficulty].length;
+  const isEachFive = progress % 5 === 0;
 
   useEffect(() => {
+    getStoredStr(ASYNC_RATED_STRING).then((data) => {
+      if (!data && isEachFive && isWordGuessed) {
+        Alert.alert(
+          'Ёсць хвілінка?',
+          'Ацэніце, калі ласка, гульню на старонцы Google Play',
+          [
+            {
+              text: 'Пазней',
+            },
+            {
+              text: 'Ацаніць',
+              onPress: () => {
+                Linking.openURL(PLAYSTORE_LINK);
+                storeStr('true', ASYNC_RATED_STRING);
+              },
+            },
+          ],
+          {
+            cancelable: true,
+          },
+        );
+      }
+    });
     progressbarValue.value = withSpring((progress * 100) / totalLength, { duration: 300 });
     //expo router casts boolean to string
     if (isWordGuessed === 'true') {
