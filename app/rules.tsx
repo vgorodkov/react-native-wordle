@@ -20,6 +20,7 @@ const RULES = [
   RULES_SCREEN_STRING.secondRule,
   RULES_SCREEN_STRING.thirdRule,
   RULES_SCREEN_STRING.fourthRule,
+  RULES_SCREEN_STRING.fifthRule,
 ];
 
 const EXAMPLE_INDEX = 2;
