@@ -1,5 +1,5 @@
 import { StyleSheet, View } from 'react-native';
-import React, { memo, useRef, useState } from 'react';
+import React, { memo, useRef } from 'react';
 import { useSelector } from 'react-redux';
 import { useSharedValue, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { RootState } from 'redux/store';
@@ -18,18 +18,14 @@ export const WordRow = memo(
   ({
     letters,
     rowIndex,
-    currentCol,
     target,
-    isActive,
   }: {
     letters: string[];
     rowIndex: number;
-    currentCol: number;
+
     target: string;
-    isActive: boolean;
   }) => {
     const word = useSelector((state: RootState) => state.game.words[rowIndex]);
-    const correctLetters = useSelector((state: RootState) => state.game.correctLetters);
 
     const prevWord = useRef(word); //store prevWord to trigger vibration only if word changes
 
@@ -67,9 +63,7 @@ export const WordRow = memo(
       if (WORDS_BY_DIFFICULTY[Difficulties.Universal].includes(word.join(''))) {
         handleCorrectWord(word.join(''), target, colors);
         handleRotateAnimation();
-        if (isActive) {
-          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        }
+        Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       } else {
         handleIncorrectWordAnimation();
         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
@@ -89,8 +83,6 @@ export const WordRow = memo(
             color={colors[index]}
             translateX={translateX[index]}
             rotationY={rotationsY[index]}
-            correctLetter={isActive ? correctLetters[index] : null}
-            isActive={currentCol === index}
           />
         ))}
       </View>
@@ -101,7 +93,8 @@ export const WordRow = memo(
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    alignItems: 'center',
+    width: '100%',
+    justifyContent: 'center',
     gap: 4,
   },
 });

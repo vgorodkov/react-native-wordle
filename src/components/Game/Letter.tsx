@@ -15,7 +15,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from 'redux/store';
 
 import { LAYOUT } from 'constants/layout';
-import { THEME } from 'constants/theme';
 import { FONT_SIZES, FONTS } from 'constants/fonts';
 
 interface LetterProps {
@@ -24,20 +23,10 @@ interface LetterProps {
   color: SharedValue<string>;
   translateX: SharedValue<number>;
   rotationY: SharedValue<number>;
-  correctLetter: string | null;
-  isActive: boolean;
 }
 
 export const Letter = memo(
-  ({
-    rowIndex,
-    letterIndex,
-    color,
-    translateX,
-    rotationY,
-    correctLetter,
-    isActive,
-  }: LetterProps) => {
+  ({ rowIndex, letterIndex, color, translateX, rotationY }: LetterProps) => {
     const letter = useSelector((state: RootState) => state.game.words[rowIndex][letterIndex]);
 
     const dispatch = useDispatch();
@@ -53,12 +42,7 @@ export const Letter = memo(
       return 1;
     });
 
-    const borderColor = isActive
-      ? THEME.colors.primary
-      : letter !== ''
-      ? 'white'
-      : 'rgba(255,255,255,0.5)';
-    const borderWidth = isActive ? 4 : 2;
+    const borderColor = letter !== '' ? 'rgba(255,255,255,1)' : 'rgba(255,255,255,0.6)';
 
     const letterStyle = useAnimatedStyle(() => {
       return {
@@ -83,13 +67,9 @@ export const Letter = memo(
 
     return (
       <Pressable onPress={handleWordLetter}>
-        <Animated.View style={[styles.wordBox, letterStyle, { borderWidth, borderColor }]}>
+        <Animated.View style={[styles.wordBox, letterStyle, { borderColor }]}>
           <Animated.Text style={[styles.letter, animatedTextStyle]}>
-            {letter === '' && correctLetter ? (
-              <Text style={styles.inactiveLetter}>{correctLetter.toUpperCase()}</Text>
-            ) : (
-              letter.toUpperCase()
-            )}
+            {letter.toUpperCase()}
           </Animated.Text>
         </Animated.View>
       </Pressable>
@@ -103,6 +83,8 @@ const styles = StyleSheet.create({
     height: LAYOUT.wordBox,
     justifyContent: 'center',
     alignItems: 'center',
+    borderWidth: 2,
+    zIndex: 10000,
   },
   letter: {
     fontSize: FONT_SIZES.smallScreen.headingMedium,
