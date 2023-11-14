@@ -54,11 +54,7 @@ export const Header = ({ target }: HeaderProps) => {
       </View>
       <View style={styles.iconsContainer}>
         <Link asChild href={'rules'}>
-          <Ionicons
-            name="help-circle-outline"
-            color={THEME.colors.primary}
-            size={LAYOUT.defaultIconSize}
-          />
+          <Ionicons name="help-circle-outline" color={'white'} size={LAYOUT.defaultIconSize} />
         </Link>
         <TouchableOpacity onPress={handleHint}>
           <Image

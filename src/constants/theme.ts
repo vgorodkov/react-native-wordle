@@ -1,8 +1,8 @@
 export const THEME = {
   colors: {
     primary: '#F6E7BE',
-    correctLetter: '#00856F',
-    inWordLetter: '#C25700',
+    correctLetter: '#5B9279',
+    inWordLetter: '#FF8552',
     notInWordLetter: '#161616',
     incorrectLetter: '#FE5F55',
     initialLetter: 'transparent',

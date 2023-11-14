@@ -49,11 +49,11 @@ const Result = () => {
 
   const progressbarValue = useSharedValue(0);
   const totalLength = DIFFICULTIES[difficulty].length;
-  const isEachFive = progress % 5 === 0;
+  const isEachTen = progress % 10 === 0;
 
   useEffect(() => {
     getStoredStr(ASYNC_RATED_STRING).then((data) => {
-      if (!data && isEachFive && isWordGuessed) {
+      if (!data && isEachTen && isWordGuessed && progress !== 0) {
         Alert.alert(
           'Ёсць хвілінка?',
           'Ацэніце, калі ласка, гульню на старонцы Google Play',
