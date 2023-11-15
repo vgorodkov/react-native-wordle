@@ -1,4 +1,4 @@
-import { Alert, ImageBackground, Linking, StyleSheet, Text, View } from 'react-native';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import React, { useEffect } from 'react';
 
 import { useLocalSearchParams } from 'expo-router';
@@ -22,7 +22,8 @@ import { RESULT_SCREEN_STRING } from 'constants/strings';
 import { Header } from 'components/Result/Header';
 import { Footer } from 'components/Result/Footer';
 import { FONTS, FONT_SIZES } from 'constants/fonts';
-import { getStoredStr, storeStr } from 'utils/asyncStorage';
+
+import * as StoreReview from 'expo-store-review';
 
 const Emoji = ({ isGuessed }: { isGuessed: boolean }) => {
   if (isGuessed) {
@@ -31,10 +32,6 @@ const Emoji = ({ isGuessed }: { isGuessed: boolean }) => {
     return <Text>&#x1F625;</Text>;
   }
 };
-
-const ASYNC_RATED_STRING = 'hasRated'; //whether the user rate the app at play store
-
-const PLAYSTORE_LINK = 'https://play.google.com/store/apps/details?id=com.tragediabelok.wordle';
 
 const Result = () => {
   const { target, isWordGuessed } = useLocalSearchParams();
@@ -52,29 +49,17 @@ const Result = () => {
   const isEachTen = progress % 10 === 0;
 
   useEffect(() => {
-    getStoredStr(ASYNC_RATED_STRING).then((data) => {
-      if (!data && isEachTen && isWordGuessed && progress !== 0) {
-        Alert.alert(
-          'Ёсць хвілінка?',
-          'Ацэніце, калі ласка, гульню на старонцы Google Play',
-          [
-            {
-              text: 'Пазней',
-            },
-            {
-              text: 'Ацаніць',
-              onPress: () => {
-                Linking.openURL(PLAYSTORE_LINK);
-                storeStr('true', ASYNC_RATED_STRING);
-              },
-            },
-          ],
-          {
-            cancelable: true,
-          },
-        );
+    const handleReview = async () => {
+      if (
+        (await StoreReview.hasAction()) &&
+        isWordGuessed === 'true' &&
+        isEachTen &&
+        progress !== 0
+      ) {
+        await StoreReview.requestReview();
       }
-    });
+    };
+
     progressbarValue.value = withSpring((progress * 100) / totalLength, { duration: 300 });
     //expo router casts boolean to string
     if (isWordGuessed === 'true') {
@@ -87,6 +72,9 @@ const Result = () => {
         dispatch(addToUnguessedWords(target));
       }
     }
+
+    handleReview();
+
     dispatch(setIsPlayable());
     dispatch(increaseCurrentWordIndex());
     dispatch(resetGame());

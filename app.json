@@ -28,13 +28,13 @@
       "bundleIdentifier": "com.tragediabelok.wordle"
     },
     "android": {
+      "playStoreUrl": "https://play.google.com/store/apps/details?id=com.tragediabelok.wordle",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#1F1F1F"
       },
       "package": "com.tragediabelok.wordle"
     },
-
     "plugins": ["expo-router"],
     "extra": {
       "router": {
