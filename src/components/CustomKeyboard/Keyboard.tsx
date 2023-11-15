@@ -40,6 +40,7 @@ const CustomKeyboard = memo(({ target, wordsRef }: CustomKeyboardProps) => {
     WORDS_BY_DIFFICULTY[Difficulties.Universal].includes(currentWord)
   ) {
     const letters = handleWordCheck(currentWord, target);
+
     for (const [key, value] of Object.entries(letters)) {
       handleKeyboardLetterAnimation(value, rows, colors, key);
     }

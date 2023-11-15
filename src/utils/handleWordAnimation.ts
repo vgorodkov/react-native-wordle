@@ -16,7 +16,10 @@ export const handleCorrectWord = (word: string, target: string, colors: SharedVa
       });
       newTarget = newTarget.replace(word[i], 's'); //remove from target correct letters and remain it with the same length.
     }
-    //check other letters wether they inWord. //For example, target is СЯБАР and СЯМ'Я is the word. Prevent from last Я marked as inWordWord. While СAСНА target and КАЗАК word second A will be marked as inWord.
+  }
+
+  //check other letters wether they inWord. //For example, target is СЯБАР and СЯМ'Я is the word. Prevent from last Я marked as inWordWord. While СAСНА target and КАЗАК word second A will be marked as inWord.
+  for (let i = 0; i < word.length; i++) {
     if (!correctIndicies.includes(i)) {
       if (newTarget.includes(word[i])) {
         colors[i].value = withTiming(THEME.colors.inWordLetter, {
@@ -31,6 +34,7 @@ export const handleCorrectWord = (word: string, target: string, colors: SharedVa
   }
 };
 
+//check other letters wether they inWord. //For example, target is СЯБАР and СЯМ'Я is the word. Prevent from last Я marked as inWordWord. While СAСНА target and КАЗАК word second A will be marked as inWord.
 /*   for (let i = 0; i < word.length; i++) {
     if (!correctIndicies.includes(i)) {
       if (newTarget.includes(word[i])) {

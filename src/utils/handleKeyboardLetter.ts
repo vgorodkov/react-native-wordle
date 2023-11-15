@@ -12,14 +12,14 @@ export const handleKeyboardLetterAnimation = (
   'worklet';
   let color = '';
   switch (variant) {
-    case 'correct':
-      color = THEME.colors.correctLetter;
-      break;
     case 'inWord':
       color = THEME.colors.inWordLetter;
       break;
     case 'notInWord':
       color = THEME.colors.notInWordLetter;
+      break;
+    case 'correct':
+      color = THEME.colors.correctLetter;
       break;
     default:
       break;

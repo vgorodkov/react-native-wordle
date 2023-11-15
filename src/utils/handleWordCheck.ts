@@ -4,13 +4,13 @@ export const handleWordCheck = (word: string, target: string) => {
   const loweredWord = word.toLowerCase();
   const loweredTarget = target.toLowerCase();
   const letters: {
-    correct: string[];
     inWord: string[];
     notInWord: string[];
+    correct: string[];
   } = {
-    correct: [],
     inWord: [],
     notInWord: [],
+    correct: [],
   };
 
   for (let i = 0; i < target.length; i++) {
