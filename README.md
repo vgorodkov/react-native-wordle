@@ -1,11 +1,9 @@
 # Belarusian Wordle Game
 
-[Screens] 
-![mobile_1](https://github.com/vgorodkov/react-native-wordle/assets/116522921/e93a480b-b047-4402-a76f-cbbceeea78f8)
-![mobile_2](https://github.com/vgorodkov/react-native-wordle/assets/116522921/f182646e-e8e6-4e64-9cd1-9af5a3255d3f)
-![mobile_3](https://github.com/vgorodkov/react-native-wordle/assets/116522921/afd60caa-1a92-4740-9674-78ca58640140)
-![mobile_4](https://github.com/vgorodkov/react-native-wordle/assets/116522921/6e3977d5-a209-4a51-8834-5ec1e84bb447)
-![mobile_5](https://github.com/vgorodkov/react-native-wordle/assets/116522921/018a1153-7675-40e0-a02f-4d246ea3d657)
+![mobile_1](https://github.com/vgorodkov/react-native-wordle/assets/116522921/4e9af6b9-3731-47bd-af2e-6b711458190a)
+![mobile_2](https://github.com/vgorodkov/react-native-wordle/assets/116522921/aa39474d-4d83-4332-8a48-702912e0d730)
+
+
 
 ## Description
 
