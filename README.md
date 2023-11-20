@@ -30,8 +30,7 @@ The "Belarusian Wordle" game is available on Google Play. Download it now to enj
 To run the game locally, follow these steps:
 
 ```bash
-git clone https://github.com/your-username/belarusian-wordle.git
-cd belarusian-wordle
+git clone https://github.com/vgorodkov/react-native-wordle
 npm install # or any other installation command
 ```
 
