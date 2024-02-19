@@ -15,8 +15,8 @@ The "Belarusian Wordle" game is a word-guessing game where players need to guess
 
 - Guess words in the Belarusian language.
 - Choose from various game difficulties.
-- Utilize flexible gameplay with Expo, Expo-Router, Reanimated, and Redux.
-- Enjoy captivating animations during responses.
+- Utilize flexible gameplay.
+- Enjoy captivating animations.
 
 ## Publication
 
