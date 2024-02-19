@@ -40,5 +40,4 @@ npm install # or any other installation command
 
 ```bash
 npm start
-# or
-yarn start
+
